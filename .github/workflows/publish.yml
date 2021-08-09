@@ -1,0 +1,45 @@
+name: publish
+on:
+  workflow_dispatch: # manually run
+    inputs:
+      releaseTag:
+        description: 'Tag the release (next, latest)'
+        required: false
+        default: 'next'
+      targetCommitish:
+        description: 'Git commit, branch or tag'
+        required: false
+        default: 'master'
+      version:
+        description: 'Version to be used in npm repository. It should correspond with version in package.json.'
+        required: true
+
+env:
+  CI: true
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Authenticate with Registry
+        run: |
+          yarn logout
+          echo "always-auth=true" > .npmrc
+          echo "@joystream:registry=https://registry.npmjs.org/" >> .npmrc
+          echo "registry=https://registry.npmjs.org/" >> .npmrc
+          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
+          npm whoami
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Install
+        run: |
+          yarn install --frozen-lockfile
+      - name: Build
+        run: |
+          yarn build
+      - name: Publish
+        run: |
+          yarn publish --tag ${{ github.event.inputs.releaseTag }} --new-version ${{ github.event.inputs.version }}
