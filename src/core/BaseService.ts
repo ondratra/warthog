@@ -159,15 +159,16 @@ export class BaseService<E extends BaseModel> {
         after
       } as RelayFirstAfter;
     }
-
+console.log('before requestedFields', fields)
     const requestedFields = this.graphQLInfoService.connectionOptions(fields);
+console.log('after requestedFields', requestedFields)
     const sorts = this.relayService.normalizeSort(orderBy);
     let whereFromCursor = {};
     if (cursor) {
       whereFromCursor = this.relayService.getFilters(orderBy, relayPageOptions);
     }
     const whereCombined: any = { AND: [whereUserInput, whereFromCursor] };
-
+console.log('whereCombined', whereCombined)
     const qb = this.buildFindQuery<W>(
       whereCombined,
       this.relayService.effectiveOrderStrings(sorts, relayPageOptions),
@@ -175,15 +176,23 @@ export class BaseService<E extends BaseModel> {
       requestedFields.selectFields,
       options
     );
+//console.log('qb', qb)
+console.log('querxoo', qb.getQuery())
+console.log(qb.expressionMap.aliases)
+console.log(qb.expressionMap.parameters)
+console.log(qb.expressionMap.wheres)
 
+console.log('whereUserInput', whereUserInput)
     let totalCountOption = {};
     if (requestedFields.totalCount) {
       // We need to get total count without applying limit. totalCount should return same result for the same where input
       // no matter which relay option is applied (after, after)
       totalCountOption = { totalCount: await this.buildFindQuery<W>(whereUserInput).getCount() };
+      //totalCountOption = 0 // remove me
     }
+console.log('prerequest', qb.getQuery())
     const rawData = await qb.getMany();
-
+console.log('postdata', rawData)
     // If we got the n+1 that we requested, pluck the last item off
     const returnData = rawData.length > limit ? rawData.slice(0, limit) : rawData;
 
@@ -207,6 +216,8 @@ export class BaseService<E extends BaseModel> {
     fields?: string[],
     options?: BaseOptions
   ): SelectQueryBuilder<E> {
+
+console.log('buildFindQuery')
     const DEFAULT_LIMIT = 50;
     const manager = options?.manager ?? this.manager;
     let qb = manager.createQueryBuilder<E>(this.entityClass, this.klass);
@@ -233,10 +244,13 @@ export class BaseService<E extends BaseModel> {
       const selection = fields
         .filter(field => this.columnMap[field]) // This will filter out any association records that come in @Fields
         .map(field => `${this.klass}.${field}`);
-
+console.log('selecttt', selection)
       qb = qb.select(selection);
     }
 
+const topQb = qb
+
+/*
     if (orderBy) {
       if (!Array.isArray(orderBy)) {
         orderBy = [orderBy];
@@ -251,6 +265,7 @@ export class BaseService<E extends BaseModel> {
         qb = qb.addOrderBy(this.attrToDBColumn(attr), direction);
       });
     }
+*/
 
     // Soft-deletes are filtered out by default, setting `deletedAt_all` is the only way to turn this off
     const hasDeletedAts = Object.keys(where).find(key => key.indexOf('deletedAt_') === 0);
@@ -275,6 +290,7 @@ export class BaseService<E extends BaseModel> {
       where: WhereFilterAttributes
     ): SelectQueryBuilder<E> => {
       // where is of shape { userName_contains: 'a' }
+console.log('mooore info', where)
       Object.keys(where).forEach((k: string) => {
         const paramKey = `param${paramKeyCounter.counter}`;
         // increment counter each time we add a new where clause so that TypeORM doesn't reuse our input variables
@@ -283,6 +299,60 @@ export class BaseService<E extends BaseModel> {
         const parts = key.toString().split('_'); // ['userName', 'contains']
         const attr = parts[0]; // userName
         const operator = parts.length > 1 ? parts[1] : 'eq'; // contains
+console.log('paarts', k, parts, attr, operator)
+console.log('processWHeresaa-builder', paramKey,
+          this.attrToDBColumn(attr),
+          operator,
+          where[key])
+
+
+
+        // simple check for relation - the attribute itself doesn't exist, but id relation does
+        const isRelation = !this.columnMap[attr] && this.columnMap[attr + 'Id']
+
+        if (isRelation) {
+          //qb.leftJoin(attr + 'Id', 'channel', `video.channelId = channel.id`, )
+          //qb.leftJoin(attr + 'Id', 'channel', `video.channelId = channel.id`)
+
+
+          const localColumn = `"${this.klass}"."${this.columnMap[attr + 'Id']}"`
+          const foreingColumn = `"${attr}"."id"`
+
+          const whereColumn = `"${attr}"."id"`
+
+          ////qb = qb.leftJoin(attr, attr, `${localColumn} = ${foreingColumn}`)
+          //qb.leftJoin(`channelsaaaaaa`, attr, `${localColumn} = ${foreingColumn}`)
+          ////topQb.leftJoin(`channelsaaaaaa`, attr, `${localColumn} = ${foreingColumn}`)
+          topQb.leftJoin(attr, attr, `${localColumn} = ${foreingColumn}`)
+console.log('ssssssss', attr, `${this.klass}.${this.columnMap[attr + 'Id']} = ${foreingColumn}`)
+          //topQb.leftJoin(attr, attr, `${this.klass}.${this.columnMap[attr + 'Id']} = ${foreingColumn}`)
+
+          //qb.innerJoin(`video.channels`, 'channel')
+          //qb.innerJoin(`channels`, 'channel')
+
+          //qb.leftJoin(attr + 'Id', 'channel')
+console.log('ADDDDED relation', `channels`, attr, `${localColumn} = ${foreingColumn}`)
+console.log(qb.getQuery())
+
+          Object.keys(where[key] as any as (string | number)[]).forEach(item => {
+            // add where conditions
+            const parts = item.toString().split('_');
+            const attr = parts[0]; // userName
+            const operator = parts.length > 1 ? parts[1] : 'eq';
+
+            qb = addQueryBuilderWhereItem(
+              qb,
+              paramKey,
+              whereColumn,
+              operator,
+              where[key]
+            )
+          })
+console.log('check', qb.getQuery())
+
+          return qb
+        }
+console.log('errriiiiiiiiiiias', attr, paramKey+'aaaaaaaaaaaaaaaaaa')
 
         return addQueryBuilderWhereItem(
           qb,
@@ -291,7 +361,20 @@ export class BaseService<E extends BaseModel> {
           operator,
           where[key]
         );
+
+
+
+        /*
+        return addQueryBuilderWhereItem(
+          qb,
+          paramKey,
+          this.attrToDBColumn(attr),
+          operator,
+          where[key]
+        );
+        */
       });
+console.log('resultaaa', qb.getQuery())
       return qb;
     };
 
@@ -306,7 +389,6 @@ export class BaseService<E extends BaseModel> {
       where: WhereExpression
     ): SelectQueryBuilder<E> => {
       const { AND, OR, ...rest } = where;
-
       if (AND && AND.length) {
         const ands = AND.filter(value => JSON.stringify(value) !== '{}');
         if (ands.length) {
@@ -352,6 +434,7 @@ export class BaseService<E extends BaseModel> {
 
       if (rest) {
         processWheres(qb, rest);
+        console.log('after rest', qb.getQuery())
       }
       return qb;
     };
@@ -367,6 +450,7 @@ export class BaseService<E extends BaseModel> {
     where: W, // V3: WhereExpression
     options?: BaseOptions
   ): Promise<E> {
+console.log('finnnndOne')
     const items = await this.find(where, undefined, undefined, undefined, undefined, options);
     if (!items.length) {
       throw new Error(`Unable to find ${this.entityClass.name} where ${JSON.stringify(where)}`);
@@ -477,6 +561,7 @@ export class BaseService<E extends BaseModel> {
   };
 
   attrToDBColumn = (attr: string): string => {
+    console.log('attrTooo', this.columnMap, attr)
     return `"${this.klass}"."${this.columnMap[attr]}"`;
   };
 }
