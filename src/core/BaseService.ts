@@ -75,7 +75,7 @@ function parseWhereKey(key: string): [string, string] {
 export class BaseService<E extends BaseModel> {
   manager: EntityManager;
   columnMap: StringMap;
-  foreignColumnMaps: Record<string, StringMap> = {} // cache for column maps of related tables
+  private foreignColumnMaps: Record<string, StringMap> = {} // cache for column maps of related tables
   klass: string;
   relayService: RelayService;
   graphQLInfoService: GraphQLInfoService;
@@ -292,31 +292,46 @@ export class BaseService<E extends BaseModel> {
         const key = k as keyof W; // userName_contains
         const [attr, operator] = parseWhereKey(key)
 
-        // simple check for relation - the attribute itself doesn't exist, but id relation does
+        // simple check for relation - the attribute itself doesn't exist, but Id column does
         const isRelation = !this.columnMap[attr] && this.columnMap[attr + 'Id'];
 
         if (isRelation) {
+          const relationMeta = this.repository.metadata.relations.find(item => item.propertyName == attr)!
+console.log('repo', relationMeta)
+          const foreignTableName = relationMeta.inverseEntityMetadata.tableName
+console.log('foreignTableNamea', foreignTableName)
           const localIdColumn = `"${this.klass}"."${this.columnMap[attr + 'Id']}"`;
-          const foreingIdColumn = `"${attr}"."id"`; // beware: this part relies on existing id column in foreign table
-
+          //const foreingIdColumn = `"${attr}"."id"`; // beware: this part relies on existing id column in foreign table
+          // TODO: this will not work for one-to-many relations
+          const foreingIdColumn = `"${foreignTableName}"."id"`; // beware: this part relies on existing id column in foreign table
+//console.log('repo', this.repository)
+//console.log('-------')
+//console.log('repo', this.repository.metadata.relations[0])
+console.log('foreingIdColumna', foreingIdColumn)
           // join must be performed on `topLevelQb` (it would be ignored on `qb` in some cases)
-          topLevelQb.leftJoin(attr, attr, `${localIdColumn} = ${foreingIdColumn}`);
+          //topLevelQb.leftJoin(attr, attr, `${localIdColumn} = ${foreingIdColumn}`);
+          topLevelQb.leftJoin(foreignTableName, foreignTableName, `${localIdColumn} = ${foreingIdColumn}`);
 
-          if (!this.foreignColumnMaps[attr]) {
-            const aliasMeta = topLevelQb.expressionMap.aliases.find(item => item.type == 'join' && item.name == attr)!
-
-            this.foreignColumnMaps[attr] = createColumnMap(aliasMeta.metadata.columns)
+//console.log('aa', attr)
+          if (!this.foreignColumnMaps[foreignTableName]) {
+            console.log('premeta', topLevelQb.expressionMap.aliases)
+            const aliasMeta = topLevelQb.expressionMap.aliases.find(item => item.type == 'join' && item.name == foreignTableName)!
+            console.log('aliasMeta', aliasMeta)
+//console.log('aac', aliasMeta)
+//console.log('omfg', topLevelQb.expressionMap.aliases)
+//console.log('aad', aliasMeta.metadata.columns)
+            this.foreignColumnMaps[foreignTableName] = createColumnMap(aliasMeta.metadata.columns)
           }
-
+//console.log('bb')
           Object.keys((where[key] as any) as (string | number)[]).forEach(item => {
             // add where conditions
             const [foreignAttr, operator] = parseWhereKey(item)
-            const foreignColumnName = this.foreignColumnMaps[attr][foreignAttr]
-            const whereColumn = `"${attr}"."${foreignColumnName}"`;
-
+            const foreignColumnName = this.foreignColumnMaps[foreignTableName][foreignAttr]
+            const whereColumn = `"${foreignTableName}"."${foreignColumnName}"`;
+//console.log('cc')
             qb = addQueryBuilderWhereItem(qb, paramKey, whereColumn, operator, where[key]);
           });
-
+//console.log('dd')
           return qb;
         }
 
