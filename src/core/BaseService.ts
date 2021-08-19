@@ -185,10 +185,14 @@ export class BaseService<E extends BaseModel> {
       options
     );
 
+console.log('cooioooountPre', await this.buildFindQuery(whereUserInput).getCount(), this.buildFindQuery(whereUserInput).getQuery())
+console.log('rrrraaaw', await this.buildFindQuery(whereUserInput).getRawMany())
+
     let totalCountOption = {};
     if (requestedFields.totalCount) {
       // We need to get total count without applying limit. totalCount should return same result for the same where input
       // no matter which relay option is applied (after, after)
+console.log('cooioooount', await this.buildFindQuery(whereUserInput).getCount())
       totalCountOption = { totalCount: await this.buildFindQuery<W>(whereUserInput).getCount() };
     }
 
@@ -329,7 +333,10 @@ console.log('foreingIdColumna', foreingIdColumn)
             const foreignColumnName = this.foreignColumnMaps[foreignTableName][foreignAttr]
             const whereColumn = `"${foreignTableName}"."${foreignColumnName}"`;
 //console.log('cc')
-            qb = addQueryBuilderWhereItem(qb, paramKey, whereColumn, operator, where[key]);
+
+console.log('doublecheeeck', paramKey, whereColumn, where[key], foreignAttr)
+            //qb = addQueryBuilderWhereItem(qb, paramKey, whereColumn, operator, where[key]);
+            qb = addQueryBuilderWhereItem(qb, paramKey, whereColumn, operator, where[key][item]);
           });
 //console.log('dd')
           return qb;
