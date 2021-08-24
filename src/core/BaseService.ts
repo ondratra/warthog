@@ -9,6 +9,7 @@ import {
   SelectQueryBuilder
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
+import { RelationMetadata } from 'typeorm/metadata/RelationMetadata'
 import { isArray } from 'util';
 import { debug } from '../decorators';
 import { StandardDeleteResponse } from '../tgql';
@@ -75,7 +76,7 @@ function parseWhereKey(key: string): [string, string] {
 export class BaseService<E extends BaseModel> {
   manager: EntityManager;
   columnMap: StringMap;
-  private foreignColumnMaps: Record<string, StringMap> = {} // cache for column maps of related tables
+  foreignColumnMaps: Record<string, StringMap> = {} // cache for column maps of related tables
   klass: string;
   relayService: RelayService;
   graphQLInfoService: GraphQLInfoService;
@@ -185,14 +186,10 @@ export class BaseService<E extends BaseModel> {
       options
     );
 
-console.log('cooioooountPre', await this.buildFindQuery(whereUserInput).getCount(), this.buildFindQuery(whereUserInput).getQuery())
-console.log('rrrraaaw', await this.buildFindQuery(whereUserInput).getRawMany())
-
     let totalCountOption = {};
     if (requestedFields.totalCount) {
       // We need to get total count without applying limit. totalCount should return same result for the same where input
       // no matter which relay option is applied (after, after)
-console.log('cooioooount', await this.buildFindQuery(whereUserInput).getCount())
       totalCountOption = { totalCount: await this.buildFindQuery<W>(whereUserInput).getCount() };
     }
 
@@ -288,59 +285,25 @@ console.log('cooioooount', await this.buildFindQuery(whereUserInput).getCount())
       qb: SelectQueryBuilder<E>,
       where: WhereFilterAttributes
     ): SelectQueryBuilder<E> => {
-      // where is of shape { userName_contains: 'a' }
+      // where is of shape { userName_contains: 'a', ... }, and/or { userGroup: { id_eq: 1 }}
       Object.keys(where).forEach((k: string) => {
-        const paramKey = `param${paramKeyCounter.counter}`;
-        // increment counter each time we add a new where clause so that TypeORM doesn't reuse our input variables
-        paramKeyCounter.counter = paramKeyCounter.counter + 1;
         const key = k as keyof W; // userName_contains
         const [attr, operator] = parseWhereKey(key)
 
-        // simple check for relation - the attribute itself doesn't exist, but Id column does
-        const isRelation = !this.columnMap[attr] && this.columnMap[attr + 'Id'];
-
+        const isRelation = RelationsManager.processWhereRelation({
+          topLevelQb,
+          qb,
+          attr,
+          whereParameter: where[key] as any as Record<string, string | number>,
+          relations: this.repository.metadata.relations,
+          baseService: this,
+          paramKeyCounter,
+        })
         if (isRelation) {
-          const relationMeta = this.repository.metadata.relations.find(item => item.propertyName == attr)!
-console.log('repo', relationMeta)
-          const foreignTableName = relationMeta.inverseEntityMetadata.tableName
-console.log('foreignTableNamea', foreignTableName)
-          const localIdColumn = `"${this.klass}"."${this.columnMap[attr + 'Id']}"`;
-          //const foreingIdColumn = `"${attr}"."id"`; // beware: this part relies on existing id column in foreign table
-          // TODO: this will not work for one-to-many relations
-          const foreingIdColumn = `"${foreignTableName}"."id"`; // beware: this part relies on existing id column in foreign table
-//console.log('repo', this.repository)
-//console.log('-------')
-//console.log('repo', this.repository.metadata.relations[0])
-console.log('foreingIdColumna', foreingIdColumn)
-          // join must be performed on `topLevelQb` (it would be ignored on `qb` in some cases)
-          //topLevelQb.leftJoin(attr, attr, `${localIdColumn} = ${foreingIdColumn}`);
-          topLevelQb.leftJoin(foreignTableName, foreignTableName, `${localIdColumn} = ${foreingIdColumn}`);
-
-//console.log('aa', attr)
-          if (!this.foreignColumnMaps[foreignTableName]) {
-            console.log('premeta', topLevelQb.expressionMap.aliases)
-            const aliasMeta = topLevelQb.expressionMap.aliases.find(item => item.type == 'join' && item.name == foreignTableName)!
-            console.log('aliasMeta', aliasMeta)
-//console.log('aac', aliasMeta)
-//console.log('omfg', topLevelQb.expressionMap.aliases)
-//console.log('aad', aliasMeta.metadata.columns)
-            this.foreignColumnMaps[foreignTableName] = createColumnMap(aliasMeta.metadata.columns)
-          }
-//console.log('bb')
-          Object.keys((where[key] as any) as (string | number)[]).forEach(item => {
-            // add where conditions
-            const [foreignAttr, operator] = parseWhereKey(item)
-            const foreignColumnName = this.foreignColumnMaps[foreignTableName][foreignAttr]
-            const whereColumn = `"${foreignTableName}"."${foreignColumnName}"`;
-//console.log('cc')
-
-console.log('doublecheeeck', paramKey, whereColumn, where[key], foreignAttr)
-            //qb = addQueryBuilderWhereItem(qb, paramKey, whereColumn, operator, where[key]);
-            qb = addQueryBuilderWhereItem(qb, paramKey, whereColumn, operator, where[key][item]);
-          });
-//console.log('dd')
-          return qb;
+          return qb
         }
+
+        const paramKey = `param${paramKeyCounter.counter++}`;
 
         return addQueryBuilderWhereItem(
           qb,
@@ -538,4 +501,103 @@ console.log('doublecheeeck', paramKey, whereColumn, where[key], foreignAttr)
   attrToDBColumn = (attr: string): string => {
     return `"${this.klass}"."${this.columnMap[attr]}"`;
   };
+}
+
+namespace RelationsManager {
+
+  interface IWhereRelationParameters<E extends BaseModel> {
+    topLevelQb: SelectQueryBuilder<E>,
+    qb: SelectQueryBuilder<E>,
+    attr: string,
+    whereParameter: Record<string, string | number>,
+    relations: RelationMetadata[]
+    baseService: BaseService<E>
+    paramKeyCounter: {
+      counter: number
+    }
+  }
+
+  export function processWhereRelation<E extends BaseModel>(
+    parameters: IWhereRelationParameters<E>,
+  ): boolean {
+    const relation = parameters.relations.find(item => item.propertyName == parameters.attr)
+    if (!relation) {
+      console.log('not relation', parameters.attr)
+      // `Unknown field "${parameters.attr}" in where clause`
+      return false
+    }
+
+    //const foreignColumnMap = createColumnMap(relation.entityMetadata.columns)
+    const foreignColumnMap = createColumnMap(relation.inverseEntityMetadata.columns)
+
+
+    // NOTICE: typeorm seems to use inverted relation naming (e.g. one-to-many when many-to-one is to be expected)
+    //         the following lines will connects the the naming conventions
+    //         case 'one-to-many' calling 'processWhereRelationOneToMany' is ok
+
+    if (relation.relationType == 'one-to-many') {
+      processWhereRelationManyToOne(parameters, relation, foreignColumnMap)
+      return true
+    }
+
+    if (relation.relationType == 'many-to-one') {
+      processWhereRelationOneToMany(parameters, relation, foreignColumnMap)
+      return true
+    }
+
+    if (relation.relationType == 'one-to-one') {
+
+    }
+
+    throw `Unknown relation type "${relation.relationType}"`
+  }
+
+  function processWhereRelationOneToMany<E extends BaseModel>(
+    parameters: IWhereRelationParameters<E>,
+    relation: RelationMetadata,
+    foreignColumnMap: StringMap,
+  ) {
+    const foreignTableName = relation.inverseEntityMetadata.tableName
+    const localIdColumn = `"${parameters.baseService.klass}"."${parameters.baseService.columnMap[parameters.attr + 'Id']}"`;
+
+    // TODO: this could be improved by reading relations metadata, but it's not done since it can become quite complex
+    // beware: this part relies on existing id column in foreign table
+    const foreignColumnName = 'id';
+
+    common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+  }
+
+  function processWhereRelationManyToOne<E extends BaseModel>(
+    parameters: IWhereRelationParameters<E>,
+    relation: RelationMetadata,
+    foreignColumnMap: StringMap,
+  ) {
+    const foreignTableName = relation.inverseEntityMetadata.tableName
+    const localIdColumn = `"${parameters.baseService.klass}"."id"`;
+    const foreignColumnName = relation.inverseRelation!.joinColumns[0].propertyName
+
+    common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+  }
+
+  function common<E extends BaseModel>(
+    parameters: IWhereRelationParameters<E>,
+    localIdColumn: string,
+    foreignTableName: string,
+    foreignColumnMap: StringMap,
+    foreignColumnName: string,
+  ) {
+    const foreingIdColumn = `"${foreignTableName}"."${foreignColumnMap[foreignColumnName]}"`;
+
+    // join must be performed on `topLevelQb` (it would be ignored on `qb` in some cases)
+    parameters.topLevelQb.leftJoin(foreignTableName, foreignTableName, `${localIdColumn} = ${foreingIdColumn}`);
+
+    Object.keys(parameters.whereParameter).forEach(item => {
+      // add where conditions
+      const [foreignAttr, operator] = parseWhereKey(item)
+      const whereColumn = `"${foreignTableName}"."${foreignColumnMap[foreignAttr]}"`;
+
+      const paramKey = `param${parameters.paramKeyCounter.counter++}`;
+      addQueryBuilderWhereItem(parameters.qb, paramKey, whereColumn, operator, parameters.whereParameter[item]);
+    });
+  }
 }
