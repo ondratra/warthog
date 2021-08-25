@@ -294,6 +294,7 @@ export class BaseService<E extends BaseModel> {
           topLevelQb,
           qb,
           attr,
+          operator,
           whereParameter: where[key] as any as Record<string, string | number>,
           relations: this.repository.metadata.relations,
           baseService: this,
@@ -509,6 +510,7 @@ namespace RelationsManager {
     topLevelQb: SelectQueryBuilder<E>,
     qb: SelectQueryBuilder<E>,
     attr: string,
+    operator: string,
     whereParameter: Record<string, string | number>,
     relations: RelationMetadata[]
     baseService: BaseService<E>
@@ -522,7 +524,6 @@ namespace RelationsManager {
   ): boolean {
     const relation = parameters.relations.find(item => item.propertyName == parameters.attr)
     if (!relation) {
-      console.log('not relation', parameters.attr)
       // `Unknown field "${parameters.attr}" in where clause`
       return false
     }
@@ -534,7 +535,6 @@ namespace RelationsManager {
     // NOTICE: typeorm seems to use inverted relation naming (e.g. one-to-many when many-to-one is to be expected)
     //         the following lines will connects the the naming conventions
     //         case 'one-to-many' calling 'processWhereRelationOneToMany' is ok
-
     if (relation.relationType == 'one-to-many') {
       processWhereRelationManyToOne(parameters, relation, foreignColumnMap)
       return true
@@ -549,6 +549,10 @@ namespace RelationsManager {
 
     }
 
+    if (relation.relationType == 'many-to-many') {
+
+    }
+
     throw `Unknown relation type "${relation.relationType}"`
   }
 
@@ -559,9 +563,6 @@ namespace RelationsManager {
   ) {
     const foreignTableName = relation.inverseEntityMetadata.tableName
     const localIdColumn = `"${parameters.baseService.klass}"."${parameters.baseService.columnMap[parameters.attr + 'Id']}"`;
-
-    // TODO: this could be improved by reading relations metadata, but it's not done since it can become quite complex
-    // beware: this part relies on existing id column in foreign table
     const foreignColumnName = 'id';
 
     common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
@@ -576,7 +577,44 @@ namespace RelationsManager {
     const localIdColumn = `"${parameters.baseService.klass}"."id"`;
     const foreignColumnName = relation.inverseRelation!.joinColumns[0].propertyName
 
-    common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+    if (parameters.operator == 'some') {
+      common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+    }
+
+    if (parameters.operator == 'none') {
+      // create temporary query that will contain temporary where condition (will eventually be discarded)
+      const tmpQb = parameters.qb.createQueryBuilder()
+      const tmpParameters = {
+        ...parameters,
+        qb: tmpQb,
+      }
+      common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+
+      // add negative where condition to the main query
+      parameters.qb.andWhere(`NOT (${tmpQb.expressionMap.wheres[0].condition})`, tmpQb.expressionMap.parameters)
+
+      return
+    }
+
+    if (parameters.operator == 'every') {
+      const tmpQb = parameters.qb.createQueryBuilder()
+      const tmpParameters = {
+        ...parameters,
+        qb: tmpQb,
+      }
+      common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+
+      const foreingIdColumn = `"${foreignTableName}"."${foreignColumnMap[foreignColumnName]}"`;
+      parameters.qb.andHaving(
+        `COUNT(${foreingIdColumn}) = COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END)`,
+        tmpQb.expressionMap.parameters
+      )
+      parameters.qb.andHaving(`COUNT(${foreingIdColumn}) > 1`) // make sure there's at least one related record
+
+      return
+    }
+
+    throw `Unknown many-to-one operator "${parameters.operator}"`
   }
 
   function common<E extends BaseModel>(
@@ -599,5 +637,7 @@ namespace RelationsManager {
       const paramKey = `param${parameters.paramKeyCounter.counter++}`;
       addQueryBuilderWhereItem(parameters.qb, paramKey, whereColumn, operator, parameters.whereParameter[item]);
     });
+
+    parameters.topLevelQb.groupBy(localIdColumn)
   }
 }
