@@ -9,6 +9,7 @@ import { Container } from 'typedi';
 import { createDBConnection } from '../torm';
 
 import { MyBase, MyBaseService } from './tests/entity/MyBase.model';
+import { MyRelations, MyRelationsService } from './tests/entity/MyRelations.model';
 
 describe('BaseService', () => {
   let connection: Connection;
@@ -276,4 +277,8 @@ describe('BaseService', () => {
 
     expect(bases.length).toEqual(3);
   });
+
+  describe('relations', async () => {
+
+  })
 });

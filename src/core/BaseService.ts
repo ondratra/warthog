@@ -527,36 +527,34 @@ namespace RelationsManager {
       // `Unknown field "${parameters.attr}" in where clause`
       return false
     }
+//console.log(relation.entityMetadata.relations)
 
-    //const foreignColumnMap = createColumnMap(relation.entityMetadata.columns)
     const foreignColumnMap = createColumnMap(relation.inverseEntityMetadata.columns)
 
-
-    // NOTICE: typeorm seems to use inverted relation naming (e.g. one-to-many when many-to-one is to be expected)
-    //         the following lines will connects the the naming conventions
-    //         case 'one-to-many' calling 'processWhereRelationOneToMany' is ok
     if (relation.relationType == 'one-to-many') {
-      processWhereRelationManyToOne(parameters, relation, foreignColumnMap)
-      return true
-    }
-
-    if (relation.relationType == 'many-to-one') {
       processWhereRelationOneToMany(parameters, relation, foreignColumnMap)
       return true
     }
 
-    if (relation.relationType == 'one-to-one') {
+    if (relation.relationType == 'many-to-one') {
+      processWhereRelationManyToOne(parameters, relation, foreignColumnMap)
+      return true
+    }
 
+    if (relation.relationType == 'one-to-one') {
+      processWhereRelationOneToOne(parameters, relation, foreignColumnMap)
+      return true
     }
 
     if (relation.relationType == 'many-to-many') {
-
+      processWhereRelationManyToMany(parameters, relation, foreignColumnMap)
+      return true
     }
 
     throw `Unknown relation type "${relation.relationType}"`
   }
 
-  function processWhereRelationOneToMany<E extends BaseModel>(
+  function processWhereRelationManyToOne<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     relation: RelationMetadata,
     foreignColumnMap: StringMap,
@@ -568,7 +566,7 @@ namespace RelationsManager {
     common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
   }
 
-  function processWhereRelationManyToOne<E extends BaseModel>(
+  function processWhereRelationOneToMany<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     relation: RelationMetadata,
     foreignColumnMap: StringMap,
@@ -617,6 +615,32 @@ namespace RelationsManager {
     throw `Unknown many-to-one operator "${parameters.operator}"`
   }
 
+  function processWhereRelationOneToOne<E extends BaseModel>(
+    parameters: IWhereRelationParameters<E>,
+    relation: RelationMetadata,
+    foreignColumnMap: StringMap,
+  ) {
+    // one-to-one owning relation can be handled the same way as one-to-many
+    if (relation.isOwning) {
+      processWhereRelationManyToOne(parameters, relation, foreignColumnMap)
+      return
+    }
+
+    const foreignTableName = relation.inverseEntityMetadata.tableName
+    const localIdColumn = `"${parameters.baseService.klass}"."id"`;
+    const foreignColumnName = relation.inverseRelation!.joinColumns[0].propertyName
+
+    common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+  }
+
+  function processWhereRelationManyToMany<E extends BaseModel>(
+    parameters: IWhereRelationParameters<E>,
+    relation: RelationMetadata,
+    foreignColumnMap: StringMap,
+  ) {
+    throw 'Not implemented yet'
+  }
+
   function common<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     localIdColumn: string,
@@ -638,6 +662,6 @@ namespace RelationsManager {
       addQueryBuilderWhereItem(parameters.qb, paramKey, whereColumn, operator, parameters.whereParameter[item]);
     });
 
-    parameters.topLevelQb.groupBy(localIdColumn)
+    parameters.topLevelQb.groupBy(`"${parameters.baseService.klass}".id`)
   }
 }
