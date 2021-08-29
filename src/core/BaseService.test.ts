@@ -9,7 +9,16 @@ import { Container } from 'typedi';
 import { createDBConnection } from '../torm';
 
 import { MyBase, MyBaseService } from './tests/entity/MyBase.model';
-import { MyRelations, MyRelationsService } from './tests/entity/MyRelations.model';
+import { 
+  Book,
+  BookService,
+  Author,
+  AuthorService,
+  Library,
+  LibraryService,
+  BookMetadata,
+  BookMetadataService,
+} from './tests/entity/Relations.model';
 
 describe('BaseService', () => {
   let connection: Connection;
@@ -278,7 +287,49 @@ describe('BaseService', () => {
     expect(bases.length).toEqual(3);
   });
 
-  describe('relations', async () => {
+  describe('relations', () => {
+    let bookService: BookService
+    let authorService: AuthorService
+    let libraryService: LibraryService
+    let bookMetadataService: BookMetadataService
 
+    let books: Book[]
+    let authors: Author[]
+    let libraries: Library[]
+    let bookMetadata: BookMetadata[]
+
+    beforeAll(async () => {
+      bookService = Container.get('BookService');
+      authorService = Container.get('AuthorService');
+      libraryService = Container.get('LibraryService');
+      bookMetadataService = Container.get('BookMetadataService');
+    })
+
+    beforeEach(async () => {
+       authors = await authorService.createMany(
+        [
+          { name: "F. Herbert" },
+          { name: "J.R.R. Tolkien" },
+        ],
+        '1'
+      )
+
+      books = await bookService.createMany(
+        [
+          { name: "Dune", author: authors[0] },
+          { name: "Lord of the Rings", author: authors[1] },
+        ],
+        '1'
+      );
+    })
+
+    test('aaaa', async () => {
+      let results = await bookService.find(
+        { author: { name: authors[0].name }},
+      )
+
+      expect(results.length).toEqual(1);
+      expect(results[0].name).toEqual(books[0].name);
+    })
   })
 });

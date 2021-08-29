@@ -48,6 +48,8 @@ input ApiOnlyWhereInput {
   name_startsWith: String
   name_endsWith: String
   name_in: [String!]
+  AND: [ApiOnlyWhereInput!]
+  OR: [ApiOnlyWhereInput!]
 }
 
 input ApiOnlyWhereUniqueInput {
@@ -111,6 +113,9 @@ input BaseWhereInput {
   deletedById_eq: String
 }
 
+"""GraphQL representation of BigInt"""
+scalar BigInt
+
 """
 A date string, such as 2007-12-03, compliant with the `full-date` format
 outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for
@@ -163,7 +168,7 @@ type DishConnection {
 input DishCreateInput {
   name: String!
   stringEnumField: StringEnum
-  kitchenSinkId: ID!
+  kitchenSink: ID!
 }
 
 type DishEdge {
@@ -182,14 +187,14 @@ enum DishOrderByInput {
   name_DESC
   stringEnumField_ASC
   stringEnumField_DESC
-  kitchenSinkId_ASC
-  kitchenSinkId_DESC
+  kitchenSink_ASC
+  kitchenSink_DESC
 }
 
 input DishUpdateInput {
   name: String
   stringEnumField: StringEnum
-  kitchenSinkId: ID
+  kitchenSink: ID
 }
 
 input DishWhereInput {
@@ -224,8 +229,9 @@ input DishWhereInput {
   name_in: [String!]
   stringEnumField_eq: StringEnum
   stringEnumField_in: [StringEnum!]
-  kitchenSinkId_eq: ID
-  kitchenSinkId_in: [ID!]
+  kitchenSink: KitchenSinkWhereInput
+  AND: [DishWhereInput!]
+  OR: [DishWhereInput!]
 }
 
 input DishWhereUniqueInput {
@@ -281,9 +287,9 @@ type KitchenSink implements BaseGraphQLObject {
   typedJsonField: EventObject
   idField: String
   stringEnumField: StringEnum
-  dishes: [Dish!]
-  numericField: String
-  numericFieldCustomPrecisionScale: String
+  dishes: [Dish!]!
+  numericField: BigInt
+  numericFieldCustomPrecisionScale: BigInt
   noFilterField: String
   noSortField: String
   noFilterOrSortField: String
@@ -477,16 +483,18 @@ input KitchenSinkWhereInput {
   idField_in: [ID!]
   stringEnumField_eq: StringEnum
   stringEnumField_in: [StringEnum!]
-  numericField_eq: String
-  numericField_contains: String
-  numericField_startsWith: String
-  numericField_endsWith: String
-  numericField_in: [String!]
-  numericFieldCustomPrecisionScale_eq: String
-  numericFieldCustomPrecisionScale_contains: String
-  numericFieldCustomPrecisionScale_startsWith: String
-  numericFieldCustomPrecisionScale_endsWith: String
-  numericFieldCustomPrecisionScale_in: [String!]
+  numericField_eq: BigInt
+  numericField_gt: BigInt
+  numericField_gte: BigInt
+  numericField_lt: BigInt
+  numericField_lte: BigInt
+  numericField_in: [BigInt!]
+  numericFieldCustomPrecisionScale_eq: BigInt
+  numericFieldCustomPrecisionScale_gt: BigInt
+  numericFieldCustomPrecisionScale_gte: BigInt
+  numericFieldCustomPrecisionScale_lt: BigInt
+  numericFieldCustomPrecisionScale_lte: BigInt
+  numericFieldCustomPrecisionScale_in: [BigInt!]
   noSortField_eq: String
   noSortField_contains: String
   noSortField_startsWith: String
@@ -517,6 +525,11 @@ input KitchenSinkWhereInput {
   arrayOfInts_containsAll: [Int!]
   arrayOfInts_containsNone: [Int!]
   arrayOfInts_containsAny: [Int!]
+  dishes_none: DishWhereInput
+  dishes_some: DishWhereInput
+  dishes_every: DishWhereInput
+  AND: [KitchenSinkWhereInput!]
+  OR: [KitchenSinkWhereInput!]
 }
 
 input KitchenSinkWhereUniqueInput {
@@ -525,12 +538,6 @@ input KitchenSinkWhereUniqueInput {
 }
 
 type Mutation {
-  createDish(data: DishCreateInput!): Dish!
-  updateDish(data: DishUpdateInput!, where: DishWhereUniqueInput!): Dish!
-  createManyDishs(data: [DishCreateInput!]!): [Dish!]!
-  deleteDish(where: DishWhereUniqueInput!): StandardDeleteResponse!
-  successfulTransaction(data: DishCreateInput!): [Dish!]!
-  failedTransaction(data: DishCreateInput!): [Dish!]!
   createKitchenSink(data: KitchenSinkCreateInput!): KitchenSink!
   createManyKitchenSinks(data: [KitchenSinkCreateInput!]!): [KitchenSink!]!
   updateKitchenSink(data: KitchenSinkUpdateInput!, where: KitchenSinkWhereUniqueInput!): KitchenSink!
@@ -545,10 +552,10 @@ type PageInfo {
 }
 
 type Query {
-  dishes(offset: Int, limit: Int = 50, where: DishWhereInput, orderBy: DishOrderByInput): [Dish!]!
+  dishes(offset: Int, limit: Int = 50, where: DishWhereInput, orderBy: [DishOrderByInput!]): [Dish!]!
   dishConnection(first: Int, after: String, last: Int, before: String, where: DishWhereInput, orderBy: DishOrderByInput): DishConnection!
   dish(where: DishWhereUniqueInput!): Dish!
-  kitchenSinks(offset: Int, limit: Int = 50, where: KitchenSinkWhereInput, orderBy: KitchenSinkOrderByInput): [KitchenSink!]!
+  kitchenSinks(offset: Int, limit: Int = 50, where: KitchenSinkWhereInput, orderBy: [KitchenSinkOrderByInput!]): [KitchenSink!]!
   kitchenSink(where: KitchenSinkWhereUniqueInput!): KitchenSink!
 }
 
