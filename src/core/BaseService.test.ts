@@ -422,11 +422,10 @@ describe('BaseService', () => {
 
       // find all libraries that contains only 5 star rated books
       let results3 = await libraryService.find(
-        { books_every: { starRating: 5 }},
+        { books_every: { starRating_eq: 5 }},
       )
 
       expect(results3.map(item => item.name)).toEqual([libraries[2].name]);
     })
-
   })
 });

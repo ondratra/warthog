@@ -593,9 +593,6 @@ console.log('grrr', parameters.operator, 'some', parameters.operator == 'some')
       }
       common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
 
-      // add negative where condition to the main query
-      //parameters.qb.andWhere(`NOT (${tmpQb.expressionMap.wheres[0].condition})`, tmpQb.expressionMap.parameters)
-
       const foreingIdColumn = `"${foreignTableName}"."${foreignColumnMap[foreignColumnName]}"`;
       parameters.qb.andHaving(
         `COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END) = 0`,
@@ -639,7 +636,7 @@ console.log('myQuery', parameters.topLevelQb.getSql())
 
     const foreignTableName = relation.inverseEntityMetadata.tableName
     const localIdColumn = `"${parameters.baseService.klass}"."id"`;
-    const foreignColumnName = relation.inverseRelation!.joinColumns[0].propertyName
+    const foreignColumnName = relation.inverseJoinColumns[0].propertyName
 
     common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
   }
@@ -649,7 +646,68 @@ console.log('myQuery', parameters.topLevelQb.getSql())
     relation: RelationMetadata,
     foreignColumnMap: StringMap,
   ) {
-    throw 'Not implemented yet'
+    //console.log(relation)
+    //throw 'Not implemented yet'
+
+    const localIdColumn = `"${parameters.baseService.klass}"."id"`;
+    const junctionTableName = relation.junctionEntityMetadata!.tableName
+    const foreignTableName = relation.inverseEntityMetadata.tableName
+    const foreingIdColumn = `"${foreignTableName}"."id"`;
+
+    // ensure proper info is loaded even in case @JoinTable decorator was used only on one side of relations
+    const junctionLocalIdColumn = relation.joinColumns.length
+      ? relation.joinColumns[0].propertyName
+      : relation.inverseRelation!.inverseJoinColumns[0].propertyName
+    const junctionForeignIdColumn = relation.inverseJoinColumns.length
+      ? relation.inverseJoinColumns[0].propertyName
+      : relation.inverseRelation!.joinColumns[0].propertyName;
+
+    parameters.topLevelQb.leftJoin(junctionTableName, junctionTableName, `${localIdColumn} = ${junctionLocalIdColumn}`);
+    parameters.topLevelQb.leftJoin(foreignTableName, foreignTableName, `${junctionForeignIdColumn} = ${foreingIdColumn}`);
+
+
+    if (parameters.operator == 'some') {
+      addWhereCondition(parameters, foreignTableName, foreignColumnMap)
+
+      return
+    }
+
+    if (parameters.operator == 'none') {
+      const tmpQb = parameters.qb.createQueryBuilder()
+      const tmpParameters = {
+        ...parameters,
+        qb: tmpQb,
+      }
+
+      addWhereCondition(tmpParameters, foreignTableName, foreignColumnMap)
+
+      parameters.qb.andHaving(
+        `COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END) = 0`,
+        tmpQb.expressionMap.parameters
+      )
+
+      return
+    }
+
+    if (parameters.operator == 'every') {
+      const tmpQb = parameters.qb.createQueryBuilder()
+      const tmpParameters = {
+        ...parameters,
+        qb: tmpQb,
+      }
+
+      addWhereCondition(tmpParameters, foreignTableName, foreignColumnMap)
+
+      parameters.qb.andHaving(
+        `COUNT(${foreingIdColumn}) = COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END)`,
+        tmpQb.expressionMap.parameters
+      )
+      parameters.qb.andHaving(`COUNT(${foreingIdColumn}) > 1`) // make sure there's at least one related record
+console.log(parameters.qb.getSql())
+      return
+    }
+
+    throw `Unknown many-to-many operator "${parameters.operator}"`
   }
 
   function common<E extends BaseModel>(
@@ -664,6 +722,26 @@ console.log('myQuery', parameters.topLevelQb.getSql())
     // join must be performed on `topLevelQb` (it would be ignored on `qb` in some cases)
     parameters.topLevelQb.leftJoin(foreignTableName, foreignTableName, `${localIdColumn} = ${foreingIdColumn}`);
 
+    addWhereCondition(parameters, foreignTableName, foreignColumnMap)
+    /*
+    Object.keys(parameters.whereParameter).forEach(item => {
+      // add where conditions
+      const [foreignAttr, operator] = parseWhereKey(item)
+      const whereColumn = `"${foreignTableName}"."${foreignColumnMap[foreignAttr]}"`;
+
+      const paramKey = `param${parameters.paramKeyCounter.counter++}`;
+      addQueryBuilderWhereItem(parameters.qb, paramKey, whereColumn, operator, parameters.whereParameter[item]);
+    });
+
+    parameters.topLevelQb.groupBy(`"${parameters.baseService.klass}".id`)
+    */
+  }
+
+  function addWhereCondition<E extends BaseModel>(
+    parameters: IWhereRelationParameters<E>,
+    foreignTableName: string,
+    foreignColumnMap: StringMap,
+  ) {
     Object.keys(parameters.whereParameter).forEach(item => {
       // add where conditions
       const [foreignAttr, operator] = parseWhereKey(item)

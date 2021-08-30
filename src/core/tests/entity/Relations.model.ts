@@ -5,14 +5,11 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { BaseModel, BaseService } from '../../';
 import { ManyToMany, ManyToOne, OneToMany, OneToOne, OneToOneJoin } from '../../..';
 
-
 /*
 Book <---> Author (N:1)
 Book <---> Library (N:M)
 Book <---> BookMetadata (1:1)
-// Book <---> Page (1:N)
 */
-
 
 @Entity()
 export class Book extends BaseModel {
@@ -41,28 +38,18 @@ export class Book extends BaseModel {
   })
   @JoinTable({
     name: 'book_in_library',
-    joinColumn: { name: 'storage_bag_id' },
-    inverseJoinColumn: { name: 'storage_bucket_id' },
+    joinColumn: { name: 'book_id' },
+    inverseJoinColumn: { name: 'library_id' },
   })
   libraries!: Library[];
 
   @OneToOneJoin(() => BookMetadata, (param: BookMetadata) => param.book, {
     nullable: true,
-    modelName: 'Video',
+    modelName: 'Book',
     relModelName: 'BookMetadata',
     propertyName: 'bookMetadata',
   })
   bookMetadata!: BookMetadata;
-
-  /*
-  @OneToMany(() => Page, (param: Page) => param.book, {
-    cascade: ["insert", "update"],
-    modelName: 'Channel',
-    relModelName: 'Page',
-    propertyName: 'pages',
-  })
-  pages?: Page[];
-  */
 }
 
 @Entity()
@@ -104,21 +91,6 @@ export class BookMetadata extends BaseModel {
   })
   book!: Book;
 }
-/*
-@Entity()
-export class Page extends BaseModel {
-  @Column()
-  name!: string;
-
-  @ManyToOne(() => Book, (param: Book) => param.pages, {
-    skipGraphQLField: true,
-    modelName: 'Page',
-    relModelName: 'Book',
-    propertyName: 'book',
-  })
-  book!: Book;
-}
-*/
 
 @Service('BookService')
 export class BookService extends BaseService<Book> {
