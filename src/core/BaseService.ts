@@ -303,7 +303,7 @@ export class BaseService<E extends BaseModel> {
         if (isRelation) {
           return qb
         }
-
+console.log('why not?', isRelation, attr, operator)
         const paramKey = `param${paramKeyCounter.counter++}`;
 
         return addQueryBuilderWhereItem(
@@ -523,14 +523,16 @@ namespace RelationsManager {
     parameters: IWhereRelationParameters<E>,
   ): boolean {
     const relation = parameters.relations.find(item => item.propertyName == parameters.attr)
+console.log('relTry', parameters.attr, parameters.relations.map(item => item.propertyName))
     if (!relation) {
+console.log('hella', parameters.relations.map(item => item.propertyName))
       // `Unknown field "${parameters.attr}" in where clause`
       return false
     }
 //console.log(relation.entityMetadata.relations)
 
     const foreignColumnMap = createColumnMap(relation.inverseEntityMetadata.columns)
-
+console.log('relType', relation.relationType)
     if (relation.relationType == 'one-to-many') {
       processWhereRelationOneToMany(parameters, relation, foreignColumnMap)
       return true
@@ -575,8 +577,11 @@ namespace RelationsManager {
     const localIdColumn = `"${parameters.baseService.klass}"."id"`;
     const foreignColumnName = relation.inverseRelation!.joinColumns[0].propertyName
 
+console.log('grrr', parameters.operator, 'some', parameters.operator == 'some')
     if (parameters.operator == 'some') {
       common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
+
+      return
     }
 
     if (parameters.operator == 'none') {
@@ -589,8 +594,14 @@ namespace RelationsManager {
       common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
 
       // add negative where condition to the main query
-      parameters.qb.andWhere(`NOT (${tmpQb.expressionMap.wheres[0].condition})`, tmpQb.expressionMap.parameters)
+      //parameters.qb.andWhere(`NOT (${tmpQb.expressionMap.wheres[0].condition})`, tmpQb.expressionMap.parameters)
 
+      const foreingIdColumn = `"${foreignTableName}"."${foreignColumnMap[foreignColumnName]}"`;
+      parameters.qb.andHaving(
+        `COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END) = 0`,
+        tmpQb.expressionMap.parameters
+      )
+console.log('myQuery', parameters.topLevelQb.getSql())
       return
     }
 

@@ -22,6 +22,9 @@ export class Book extends BaseModel {
   @Column()
   name!: string;
 
+  @Column()
+  starRating!: number;
+
   @ManyToOne(() => Author, (param: Author) => param.books, {
     skipGraphQLField: true,
     nullable: true,
@@ -86,7 +89,7 @@ export class Library extends BaseModel {
     relModelName: 'Book',
     propertyName: 'books',
   })
-  books!: Library[];
+  books!: Book[];
 }
 
 @Entity()

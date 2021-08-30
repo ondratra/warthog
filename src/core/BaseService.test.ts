@@ -9,7 +9,7 @@ import { Container } from 'typedi';
 import { createDBConnection } from '../torm';
 
 import { MyBase, MyBaseService } from './tests/entity/MyBase.model';
-import { 
+import {
   Book,
   BookService,
   Author,
@@ -287,7 +287,7 @@ describe('BaseService', () => {
     expect(bases.length).toEqual(3);
   });
 
-  describe('relations', () => {
+  describe('RelationFiltering', () => {
     let bookService: BookService
     let authorService: AuthorService
     let libraryService: LibraryService
@@ -296,7 +296,7 @@ describe('BaseService', () => {
     let books: Book[]
     let authors: Author[]
     let libraries: Library[]
-    let bookMetadata: BookMetadata[]
+    let bookMetadatas: BookMetadata[]
 
     beforeAll(async () => {
       bookService = Container.get('BookService');
@@ -306,30 +306,127 @@ describe('BaseService', () => {
     })
 
     beforeEach(async () => {
-       authors = await authorService.createMany(
+      authors = await authorService.createMany(
         [
-          { name: "F. Herbert" },
-          { name: "J.R.R. Tolkien" },
-        ],
+          { name: 'F. Herbert' },
+          { name: 'J.R.R. Tolkien' },
+          { name: 'P.K. Dick' },
+        ].map((item: Partial<Author>, index) => (item.id = 'author' + index, item)),
+        '1'
+      )
+//problem je kokurence -> prepsat
+      books = await bookService.createMany(
+        [
+          { name: 'Dune', author: authors[0], starRating: 5 },
+          { name: 'The Lord of the Rings', author: authors[1], starRating: 5 },
+          { name: 'Do Androids Dream of Electric Sheep?', author: authors[2], starRating: 5 },
+
+          { name: 'Dune Messiah', author: authors[0], starRating: 4 },
+          { name: 'The Hobbit', author: authors[1], starRating: 4 },
+          { name: 'A Scanner Darkly', author: authors[2], starRating: 5 },
+
+          { name: 'Children of Dune', author: authors[0], starRating: 1 },
+          { name: 'The Silmarillion', author: authors[1], starRating: 3 },
+          { name: 'The Minority Report', author: authors[2], starRating: 5 },
+        ].map((item: Partial<Book>, index) => (item.id = 'book' + index, item)),
+        '1'
+      );
+
+      libraries = await libraryService.createMany(
+        [
+          { name: 'Berlin Library', books },
+          { name: 'Prague Library', books: books.slice(0, 6) },
+          { name: 'Dallas Library', books: books.slice(0, 3) },
+        ].map((item: Partial<Library>, index) => (item.id = 'library' + index, item)),
         '1'
       )
 
-      books = await bookService.createMany(
+      bookMetadatas = await bookMetadataService.createMany(
         [
-          { name: "Dune", author: authors[0] },
-          { name: "Lord of the Rings", author: authors[1] },
-        ],
+          { ISBN: 'Dummy ISBN 0', book: books[0] },
+          { ISBN: 'Dummy ISBN 1', book: books[1] },
+          { ISBN: 'Dummy ISBN 2', book: books[2] },
+          { ISBN: 'Dummy ISBN 3', book: books[3] },
+          { ISBN: 'Dummy ISBN 4', book: books[4] },
+          { ISBN: 'Dummy ISBN 5', book: books[5] },
+          { ISBN: 'Dummy ISBN 6', book: books[6] },
+          { ISBN: 'Dummy ISBN 7', book: books[7] },
+          { ISBN: 'Dummy ISBN 8', book: books[8] },
+        ].map((item: Partial<BookMetadata>, index) => (item.id = 'bookMetadata' + index, item)),
         '1'
-      );
+      )
     })
 
-    test('aaaa', async () => {
+    test('N:1', async () => {
+      // find all books with author's name being X
       let results = await bookService.find(
         { author: { name: authors[0].name }},
       )
 
-      expect(results.length).toEqual(1);
-      expect(results[0].name).toEqual(books[0].name);
+      expect(results.map(item => item.name)).toEqual([books[0].name, books[3].name, books[6].name]);
     })
+
+    test('1:1', async () => {
+      // find all books' metadata containing ISBN X
+      let results1 = await bookService.find(
+        { bookMetadata: { ISBN: bookMetadatas[1].ISBN }},
+      )
+
+      expect(results1.map(item => item.name)).toEqual([books[1].name]);
+
+      // inverse query
+      let results2 = await bookMetadataService.find(
+        { book: { name: books[2].name }},
+      )
+
+      expect(results2.map(item => item.ISBN)).toEqual([bookMetadatas[2].ISBN]);
+    })
+
+    test('1:N', async () => {
+      // find authors that have written at least one book called X
+      let results1 = await authorService.find(
+        { books_some: { name: books[4].name }},
+      )
+
+      expect(results1.map(item => item.name)).toEqual([authors[1].name]);
+
+      // find authors that have only written books with star rating higher than 1
+      let results2 = await authorService.find(
+        { books_none: { starRating: 1 }},
+      )
+
+      expect(results2.map(item => item.name)).toEqual([authors[1].name, authors[2].name]);
+
+      // find authors that have written only 5 star rated books
+      let results3 = await authorService.find(
+        { books_every: { starRating: 5 }},
+      )
+
+      expect(results3.map(item => item.name)).toEqual([authors[2].name]);
+    })
+
+    test.only('N:M', async () => {
+      // find all books that are present in library X
+      let results1 = await bookService.find(
+        { libraries_some: { name: libraries[1].name }},
+      )
+
+      expect(results1.map(item => item.name)).toEqual(books.slice(0, 6).map(item => item.name));
+
+      // find all libraries that don't contain 1 star rated book
+      let results2 = await libraryService.find(
+        { books_none: { starRating: 1 }},
+      )
+
+      expect(results2.map(item => item.name)).toEqual([libraries[1].name, libraries[2].name]);
+
+      // find all libraries that contains only 5 star rated books
+      let results3 = await libraryService.find(
+        { books_every: { starRating: 5 }},
+      )
+
+      expect(results3.map(item => item.name)).toEqual([libraries[2].name]);
+    })
+
   })
 });
