@@ -290,6 +290,7 @@ export class BaseService<E extends BaseModel> {
         const key = k as keyof W; // userName_contains
         const [attr, operator] = parseWhereKey(key)
 
+        // check if attr represents related entity and prepare where clauses if so
         const isRelation = RelationsManager.processWhereRelation({
           topLevelQb,
           qb,
@@ -303,9 +304,11 @@ export class BaseService<E extends BaseModel> {
         if (isRelation) {
           return qb
         }
-console.log('why not?', isRelation, attr, operator)
+
+        // prepare unique name for query parameter
         const paramKey = `param${paramKeyCounter.counter++}`;
 
+        // add where conditions
         return addQueryBuilderWhereItem(
           qb,
           paramKey,
@@ -519,20 +522,24 @@ namespace RelationsManager {
     }
   }
 
+  /*
+    Setup relation part of a query if the given `where` object's property represents a related entity.
+    Returns true if the relation was found and query was changed, false otherwise.
+  */
   export function processWhereRelation<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
   ): boolean {
+    // try to find property among relations
     const relation = parameters.relations.find(item => item.propertyName == parameters.attr)
-console.log('relTry', parameters.attr, parameters.relations.map(item => item.propertyName))
     if (!relation) {
-console.log('hella', parameters.relations.map(item => item.propertyName))
-      // `Unknown field "${parameters.attr}" in where clause`
       return false
     }
-//console.log(relation.entityMetadata.relations)
 
+    // prepare column map for related entity
     const foreignColumnMap = createColumnMap(relation.inverseEntityMetadata.columns)
-console.log('relType', relation.relationType)
+
+    // continue depending on relation cardinality
+
     if (relation.relationType == 'one-to-many') {
       processWhereRelationOneToMany(parameters, relation, foreignColumnMap)
       return true
@@ -556,34 +563,45 @@ console.log('relType', relation.relationType)
     throw `Unknown relation type "${relation.relationType}"`
   }
 
+  /*
+    Setups SQL joins and where conditions for properties of related entity.
+  */
   function processWhereRelationManyToOne<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     relation: RelationMetadata,
     foreignColumnMap: StringMap,
   ) {
+    // prepare connection parameters
     const foreignTableName = relation.inverseEntityMetadata.tableName
     const localIdColumn = `"${parameters.baseService.klass}"."${parameters.baseService.columnMap[parameters.attr + 'Id']}"`;
     const foreignColumnName = 'id';
 
+    // setup SQL join and where conditions
     common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
   }
 
+  /*
+    Prepares join and where clauses for query builder for one-to-many relation.
+  */
   function processWhereRelationOneToMany<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     relation: RelationMetadata,
     foreignColumnMap: StringMap,
   ) {
+    // prepare connection parameters
     const foreignTableName = relation.inverseEntityMetadata.tableName
     const localIdColumn = `"${parameters.baseService.klass}"."id"`;
     const foreignColumnName = relation.inverseRelation!.joinColumns[0].propertyName
 
-console.log('grrr', parameters.operator, 'some', parameters.operator == 'some')
+    // entities with at least one related entity passing condition requested?
     if (parameters.operator == 'some') {
+      // setup SQL join and where conditions
       common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
 
       return
     }
 
+    // entities with none of related entities passing condition requested?
     if (parameters.operator == 'none') {
       // create temporary query that will contain temporary where condition (will eventually be discarded)
       const tmpQb = parameters.qb.createQueryBuilder()
@@ -591,25 +609,31 @@ console.log('grrr', parameters.operator, 'some', parameters.operator == 'some')
         ...parameters,
         qb: tmpQb,
       }
+      // setup SQL join and where conditions
       common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
 
+      // convert where clause created for temporary query builder into "none of" form
       const foreingIdColumn = `"${foreignTableName}"."${foreignColumnMap[foreignColumnName]}"`;
       parameters.qb.andHaving(
         `COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END) = 0`,
         tmpQb.expressionMap.parameters
       )
-console.log('myQuery', parameters.topLevelQb.getSql())
+
       return
     }
 
+    // entities with all related entities passing condition requested?
     if (parameters.operator == 'every') {
+      // create temporary query that will contain temporary where condition (will eventually be discarded)
       const tmpQb = parameters.qb.createQueryBuilder()
       const tmpParameters = {
         ...parameters,
         qb: tmpQb,
       }
+      // setup SQL join and where conditions
       common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
 
+      // convert where clause created for temporary query builder into "every" form
       const foreingIdColumn = `"${foreignTableName}"."${foreignColumnMap[foreignColumnName]}"`;
       parameters.qb.andHaving(
         `COUNT(${foreingIdColumn}) = COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END)`,
@@ -623,32 +647,38 @@ console.log('myQuery', parameters.topLevelQb.getSql())
     throw `Unknown many-to-one operator "${parameters.operator}"`
   }
 
+  /*
+    Prepares join and where clauses for query builder for one-to-one relation.
+  */
   function processWhereRelationOneToOne<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     relation: RelationMetadata,
     foreignColumnMap: StringMap,
   ) {
-    // one-to-one owning relation can be handled the same way as one-to-many
+    // one-to-one owning relation can be handled the same way as many-to-one
     if (relation.isOwning) {
       processWhereRelationManyToOne(parameters, relation, foreignColumnMap)
       return
     }
 
+    // prepare connection parameters
     const foreignTableName = relation.inverseEntityMetadata.tableName
     const localIdColumn = `"${parameters.baseService.klass}"."id"`;
-    const foreignColumnName = relation.inverseJoinColumns[0].propertyName
+    const foreignColumnName = relation.inverseRelation!.joinColumns[0].propertyName
 
+    // setup SQL join and where conditions
     common(parameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName)
   }
 
+  /*
+    Prepares join and where clauses for query builder for many-to-many relation.
+  */
   function processWhereRelationManyToMany<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     relation: RelationMetadata,
     foreignColumnMap: StringMap,
   ) {
-    //console.log(relation)
-    //throw 'Not implemented yet'
-
+    // prepare connection parameters
     const localIdColumn = `"${parameters.baseService.klass}"."id"`;
     const junctionTableName = relation.junctionEntityMetadata!.tableName
     const foreignTableName = relation.inverseEntityMetadata.tableName
@@ -662,25 +692,31 @@ console.log('myQuery', parameters.topLevelQb.getSql())
       ? relation.inverseJoinColumns[0].propertyName
       : relation.inverseRelation!.joinColumns[0].propertyName;
 
+    // include junction and foreign tables in query
     parameters.topLevelQb.leftJoin(junctionTableName, junctionTableName, `${localIdColumn} = ${junctionLocalIdColumn}`);
     parameters.topLevelQb.leftJoin(foreignTableName, foreignTableName, `${junctionForeignIdColumn} = ${foreingIdColumn}`);
 
-
+    // entities with at least one related entity passing condition requested?
     if (parameters.operator == 'some') {
+      // add where conditions
       addWhereCondition(parameters, foreignTableName, foreignColumnMap)
 
       return
     }
 
+    // entities with none of related entities passing condition requested?
     if (parameters.operator == 'none') {
+      // create temporary query that will contain temporary where condition (will eventually be discarded)
       const tmpQb = parameters.qb.createQueryBuilder()
       const tmpParameters = {
         ...parameters,
         qb: tmpQb,
       }
 
+      // setup where conditions
       addWhereCondition(tmpParameters, foreignTableName, foreignColumnMap)
 
+      // convert where clause created for temporary query builder into "none of" form
       parameters.qb.andHaving(
         `COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END) = 0`,
         tmpQb.expressionMap.parameters
@@ -689,27 +725,34 @@ console.log('myQuery', parameters.topLevelQb.getSql())
       return
     }
 
+    // entities with all related entities passing condition requested?
     if (parameters.operator == 'every') {
+      // create temporary query that will contain temporary where condition (will eventually be discarded)
       const tmpQb = parameters.qb.createQueryBuilder()
       const tmpParameters = {
         ...parameters,
         qb: tmpQb,
       }
 
+      // setup where conditions
       addWhereCondition(tmpParameters, foreignTableName, foreignColumnMap)
 
+      // convert where clause created for temporary query builder into "every" form
       parameters.qb.andHaving(
         `COUNT(${foreingIdColumn}) = COUNT(CASE WHEN ${tmpQb.expressionMap.wheres[0].condition} THEN 1 ELSE NULL END)`,
         tmpQb.expressionMap.parameters
       )
       parameters.qb.andHaving(`COUNT(${foreingIdColumn}) > 1`) // make sure there's at least one related record
-console.log(parameters.qb.getSql())
+
       return
     }
 
     throw `Unknown many-to-many operator "${parameters.operator}"`
   }
 
+  /*
+    Setups common part of join and where clauses for one-to-many, one-to-one, and many-to-oner relations.
+  */
   function common<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     localIdColumn: string,
@@ -723,34 +766,26 @@ console.log(parameters.qb.getSql())
     parameters.topLevelQb.leftJoin(foreignTableName, foreignTableName, `${localIdColumn} = ${foreingIdColumn}`);
 
     addWhereCondition(parameters, foreignTableName, foreignColumnMap)
-    /*
-    Object.keys(parameters.whereParameter).forEach(item => {
-      // add where conditions
-      const [foreignAttr, operator] = parseWhereKey(item)
-      const whereColumn = `"${foreignTableName}"."${foreignColumnMap[foreignAttr]}"`;
-
-      const paramKey = `param${parameters.paramKeyCounter.counter++}`;
-      addQueryBuilderWhereItem(parameters.qb, paramKey, whereColumn, operator, parameters.whereParameter[item]);
-    });
-
-    parameters.topLevelQb.groupBy(`"${parameters.baseService.klass}".id`)
-    */
   }
 
+  /*
+    Adds where clauses targeting related entities.
+  */
   function addWhereCondition<E extends BaseModel>(
     parameters: IWhereRelationParameters<E>,
     foreignTableName: string,
     foreignColumnMap: StringMap,
   ) {
+    // add where condition for each conditioned property
     Object.keys(parameters.whereParameter).forEach(item => {
-      // add where conditions
       const [foreignAttr, operator] = parseWhereKey(item)
       const whereColumn = `"${foreignTableName}"."${foreignColumnMap[foreignAttr]}"`;
-
       const paramKey = `param${parameters.paramKeyCounter.counter++}`;
+
       addQueryBuilderWhereItem(parameters.qb, paramKey, whereColumn, operator, parameters.whereParameter[item]);
     });
 
+    // add necessary group by
     parameters.topLevelQb.groupBy(`"${parameters.baseService.klass}".id`)
   }
 }

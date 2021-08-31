@@ -314,7 +314,7 @@ describe('BaseService', () => {
         ].map((item: Partial<Author>, index) => (item.id = 'author' + index, item)),
         '1'
       )
-//problem je kokurence -> prepsat
+
       books = await bookService.createMany(
         [
           { name: 'Dune', author: authors[0], starRating: 5 },
@@ -405,7 +405,7 @@ describe('BaseService', () => {
       expect(results3.map(item => item.name)).toEqual([authors[2].name]);
     })
 
-    test.only('N:M', async () => {
+    test('N:M', async () => {
       // find all books that are present in library X
       let results1 = await bookService.find(
         { libraries_some: { name: libraries[1].name }},
