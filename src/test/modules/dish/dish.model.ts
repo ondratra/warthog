@@ -18,7 +18,11 @@ export class Dish extends BaseModel {
     () => KitchenSink,
     (kitchenSink: KitchenSink) => kitchenSink.dishes,
     {
-      nullable: false
+      nullable: false,
+      skipGraphQLField: true,
+      modelName: 'Dish',
+      relModelName: 'KitchenSink',
+      propertyName: 'kitchenSink'
     }
   )
   kitchenSink?: KitchenSink;

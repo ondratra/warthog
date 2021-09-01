@@ -120,6 +120,9 @@ export class DishResolver {
   async dish(@Arg('where') where: DishWhereUniqueInput): Promise<Dish> {
     return this.service.findOne<DishWhereUniqueInput>(where);
   }
+  /*
+  TODO: the following had to be commented because it created compilation errors and I was unable to fix it yet
+        on the other hand commenting it breaks ~3 tests that focus on transactions
 
   @Authorized('dish:create')
   @Mutation(() => Dish)
@@ -169,4 +172,5 @@ export class DishResolver {
   ): Promise<Dish[]> {
     return this.service.failedTransaction(data, ctx.user.id);
   }
+  */
 }

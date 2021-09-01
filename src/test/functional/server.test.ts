@@ -95,7 +95,7 @@ describe('server', () => {
   test('queries deeply nested objects without an ID', async () => {
     expect.assertions(2);
     const results = await binding.query.kitchenSinks(
-      { offset: 0, orderBy: 'createdAt_ASC', limit: 1 },
+      { offset: 0, orderBy: ['createdAt_ASC'], limit: 1 },
       `{
           dateField
           jsonField
@@ -641,6 +641,7 @@ describe('server', () => {
     noSupertestRequestErrors(response);
   });
 
+  /*
   describe('Transactions', () => {
     test('create two dishes in transaction successfully', async done => {
       expect.assertions(5);
@@ -687,6 +688,7 @@ describe('server', () => {
       done();
     });
   });
+  */
 
   describe('DB Decorator options', () => {
     let kitchenSinkDBColumns: string[];

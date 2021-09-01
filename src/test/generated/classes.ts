@@ -14,12 +14,14 @@ import { ArgsType, Field as TypeGraphQLField, Float, InputType as TypeGraphQLInp
 // @ts-ignore
 import { registerEnumType, GraphQLISODateTime as DateTime } from "type-graphql";
 
+import * as BN from "bn.js";
+
 // prettier-ignore
 // @ts-ignore eslint-disable-next-line @typescript-eslint/no-var-requires
 const { GraphQLJSONObject } = require('graphql-type-json');
 // prettier-ignore
 // @ts-ignore
-import { BaseWhereInput, JsonObject, PaginationArgs, DateOnlyString, DateTimeString } from '../../';
+import { BaseWhereInput, JsonObject, PaginationArgs, DateOnlyString, DateTimeString, BigInt, Bytes } from '../../';
 
 import { StringEnum } from "../modules/kitchen-sink/kitchen-sink.model";
 
@@ -140,6 +142,12 @@ export class ApiOnlyWhereInput {
 
   @TypeGraphQLField(() => [String], { nullable: true })
   name_in?: string[];
+
+  @TypeGraphQLField(() => ApiOnlyWhereInput, { nullable: true })
+  AND?: [ApiOnlyWhereInput];
+
+  @TypeGraphQLField(() => ApiOnlyWhereInput, { nullable: true })
+  OR?: [ApiOnlyWhereInput];
 }
 
 @TypeGraphQLInputType()
@@ -166,7 +174,7 @@ export class ApiOnlyWhereArgs extends PaginationArgs {
   where?: ApiOnlyWhereInput;
 
   @TypeGraphQLField(() => ApiOnlyOrderByEnum, { nullable: true })
-  orderBy?: ApiOnlyOrderByEnum;
+  orderBy?: ApiOnlyOrderByEnum[];
 }
 
 @ArgsType()
@@ -471,34 +479,40 @@ export class KitchenSinkWhereInput {
   @TypeGraphQLField(() => [StringEnum], { nullable: true })
   stringEnumField_in?: StringEnum[];
 
-  @TypeGraphQLField({ nullable: true })
+  @TypeGraphQLField(() => BigInt, { nullable: true })
   numericField_eq?: string;
 
-  @TypeGraphQLField({ nullable: true })
-  numericField_contains?: string;
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericField_gt?: string;
 
-  @TypeGraphQLField({ nullable: true })
-  numericField_startsWith?: string;
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericField_gte?: string;
 
-  @TypeGraphQLField({ nullable: true })
-  numericField_endsWith?: string;
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericField_lt?: string;
 
-  @TypeGraphQLField(() => [String], { nullable: true })
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericField_lte?: string;
+
+  @TypeGraphQLField(() => [BigInt], { nullable: true })
   numericField_in?: string[];
 
-  @TypeGraphQLField({ nullable: true })
+  @TypeGraphQLField(() => BigInt, { nullable: true })
   numericFieldCustomPrecisionScale_eq?: string;
 
-  @TypeGraphQLField({ nullable: true })
-  numericFieldCustomPrecisionScale_contains?: string;
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericFieldCustomPrecisionScale_gt?: string;
 
-  @TypeGraphQLField({ nullable: true })
-  numericFieldCustomPrecisionScale_startsWith?: string;
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericFieldCustomPrecisionScale_gte?: string;
 
-  @TypeGraphQLField({ nullable: true })
-  numericFieldCustomPrecisionScale_endsWith?: string;
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericFieldCustomPrecisionScale_lt?: string;
 
-  @TypeGraphQLField(() => [String], { nullable: true })
+  @TypeGraphQLField(() => BigInt, { nullable: true })
+  numericFieldCustomPrecisionScale_lte?: string;
+
+  @TypeGraphQLField(() => [BigInt], { nullable: true })
   numericFieldCustomPrecisionScale_in?: string[];
 
   @TypeGraphQLField({ nullable: true })
@@ -590,6 +604,21 @@ export class KitchenSinkWhereInput {
 
   @TypeGraphQLField(() => [Int], { nullable: true })
   arrayOfInts_containsAny?: [number];
+
+  @TypeGraphQLField(() => DishWhereInput, { nullable: true })
+  dishes_none?: DishWhereInput;
+
+  @TypeGraphQLField(() => DishWhereInput, { nullable: true })
+  dishes_some?: DishWhereInput;
+
+  @TypeGraphQLField(() => DishWhereInput, { nullable: true })
+  dishes_every?: DishWhereInput;
+
+  @TypeGraphQLField(() => KitchenSinkWhereInput, { nullable: true })
+  AND?: [KitchenSinkWhereInput];
+
+  @TypeGraphQLField(() => KitchenSinkWhereInput, { nullable: true })
+  OR?: [KitchenSinkWhereInput];
 }
 
 @TypeGraphQLInputType()
@@ -775,7 +804,7 @@ export class KitchenSinkWhereArgs extends PaginationArgs {
   where?: KitchenSinkWhereInput;
 
   @TypeGraphQLField(() => KitchenSinkOrderByEnum, { nullable: true })
-  orderBy?: KitchenSinkOrderByEnum;
+  orderBy?: KitchenSinkOrderByEnum[];
 }
 
 @ArgsType()
@@ -806,8 +835,8 @@ export enum DishOrderByEnum {
   stringEnumField_ASC = "stringEnumField_ASC",
   stringEnumField_DESC = "stringEnumField_DESC",
 
-  kitchenSinkId_ASC = "kitchenSinkId_ASC",
-  kitchenSinkId_DESC = "kitchenSinkId_DESC"
+  kitchenSink_ASC = "kitchenSink_ASC",
+  kitchenSink_DESC = "kitchenSink_DESC"
 }
 
 registerEnumType(DishOrderByEnum, {
@@ -909,11 +938,14 @@ export class DishWhereInput {
   @TypeGraphQLField(() => [StringEnum], { nullable: true })
   stringEnumField_in?: StringEnum[];
 
-  @TypeGraphQLField(() => ID, { nullable: true })
-  kitchenSinkId_eq?: string;
+  @TypeGraphQLField(() => KitchenSinkWhereInput, { nullable: true })
+  kitchenSink?: KitchenSinkWhereInput;
 
-  @TypeGraphQLField(() => [ID], { nullable: true })
-  kitchenSinkId_in?: string[];
+  @TypeGraphQLField(() => DishWhereInput, { nullable: true })
+  AND?: [DishWhereInput];
+
+  @TypeGraphQLField(() => DishWhereInput, { nullable: true })
+  OR?: [DishWhereInput];
 }
 
 @TypeGraphQLInputType()
@@ -931,7 +963,7 @@ export class DishCreateInput {
   stringEnumField?: StringEnum;
 
   @TypeGraphQLField(() => ID)
-  kitchenSinkId!: string;
+  kitchenSink!: string;
 }
 
 @TypeGraphQLInputType()
@@ -943,7 +975,7 @@ export class DishUpdateInput {
   stringEnumField?: StringEnum;
 
   @TypeGraphQLField(() => ID, { nullable: true })
-  kitchenSinkId?: string;
+  kitchenSink?: string;
 }
 
 @ArgsType()
@@ -952,7 +984,7 @@ export class DishWhereArgs extends PaginationArgs {
   where?: DishWhereInput;
 
   @TypeGraphQLField(() => DishOrderByEnum, { nullable: true })
-  orderBy?: DishOrderByEnum;
+  orderBy?: DishOrderByEnum[];
 }
 
 @ArgsType()
