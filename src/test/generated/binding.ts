@@ -6,20 +6,14 @@ import { IResolvers } from 'graphql-tools/dist/Interfaces'
 import * as schema from  './schema.graphql'
 
 export interface Query {
-    dishes: <T = Array<Dish>>(args: { offset?: Int | null, limit?: Int | null, where?: DishWhereInput | null, orderBy?: DishOrderByInput | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
+    dishes: <T = Array<Dish>>(args: { offset?: Int | null, limit?: Int | null, where?: DishWhereInput | null, orderBy?: Array<DishOrderByInput> | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     dishConnection: <T = DishConnection>(args: { first?: Int | null, after?: String | null, last?: Int | null, before?: String | null, where?: DishWhereInput | null, orderBy?: DishOrderByInput | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     dish: <T = Dish>(args: { where: DishWhereUniqueInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
-    kitchenSinks: <T = Array<KitchenSink>>(args: { offset?: Int | null, limit?: Int | null, where?: KitchenSinkWhereInput | null, orderBy?: KitchenSinkOrderByInput | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
+    kitchenSinks: <T = Array<KitchenSink>>(args: { offset?: Int | null, limit?: Int | null, where?: KitchenSinkWhereInput | null, orderBy?: Array<KitchenSinkOrderByInput> | null }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     kitchenSink: <T = KitchenSink>(args: { where: KitchenSinkWhereUniqueInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> 
   }
 
 export interface Mutation {
-    createDish: <T = Dish>(args: { data: DishCreateInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
-    updateDish: <T = Dish>(args: { data: DishUpdateInput, where: DishWhereUniqueInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
-    createManyDishs: <T = Array<Dish>>(args: { data: Array<DishCreateInput> }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
-    deleteDish: <T = StandardDeleteResponse>(args: { where: DishWhereUniqueInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
-    successfulTransaction: <T = Array<Dish>>(args: { data: DishCreateInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
-    failedTransaction: <T = Array<Dish>>(args: { data: DishCreateInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     createKitchenSink: <T = KitchenSink>(args: { data: KitchenSinkCreateInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     createManyKitchenSinks: <T = Array<KitchenSink>>(args: { data: Array<KitchenSinkCreateInput> }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     updateKitchenSink: <T = KitchenSink>(args: { data: KitchenSinkUpdateInput, where: KitchenSinkWhereUniqueInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
@@ -62,8 +56,8 @@ export type DishOrderByInput =   'createdAt_ASC' |
   'name_DESC' |
   'stringEnumField_ASC' |
   'stringEnumField_DESC' |
-  'kitchenSinkId_ASC' |
-  'kitchenSinkId_DESC'
+  'kitchenSink_ASC' |
+  'kitchenSink_DESC'
 
 export type KitchenSinkOrderByInput =   'createdAt_ASC' |
   'createdAt_DESC' |
@@ -147,6 +141,8 @@ export interface ApiOnlyWhereInput {
   name_startsWith?: String | null
   name_endsWith?: String | null
   name_in?: String[] | String | null
+  AND?: ApiOnlyWhereInput[] | ApiOnlyWhereInput | null
+  OR?: ApiOnlyWhereInput[] | ApiOnlyWhereInput | null
 }
 
 export interface ApiOnlyWhereUniqueInput {
@@ -180,13 +176,13 @@ export interface BaseWhereInput {
 export interface DishCreateInput {
   name: String
   stringEnumField?: StringEnum | null
-  kitchenSinkId: ID_Output
+  kitchenSink: ID_Output
 }
 
 export interface DishUpdateInput {
   name?: String | null
   stringEnumField?: StringEnum | null
-  kitchenSinkId?: ID_Input | null
+  kitchenSink?: ID_Input | null
 }
 
 export interface DishWhereInput {
@@ -221,8 +217,9 @@ export interface DishWhereInput {
   name_in?: String[] | String | null
   stringEnumField_eq?: StringEnum | null
   stringEnumField_in?: StringEnum[] | StringEnum | null
-  kitchenSinkId_eq?: ID_Input | null
-  kitchenSinkId_in?: ID_Output[] | ID_Output | null
+  kitchenSink?: KitchenSinkWhereInput | null
+  AND?: DishWhereInput[] | DishWhereInput | null
+  OR?: DishWhereInput[] | DishWhereInput | null
 }
 
 export interface DishWhereUniqueInput {
@@ -374,16 +371,18 @@ export interface KitchenSinkWhereInput {
   idField_in?: ID_Output[] | ID_Output | null
   stringEnumField_eq?: StringEnum | null
   stringEnumField_in?: StringEnum[] | StringEnum | null
-  numericField_eq?: String | null
-  numericField_contains?: String | null
-  numericField_startsWith?: String | null
-  numericField_endsWith?: String | null
-  numericField_in?: String[] | String | null
-  numericFieldCustomPrecisionScale_eq?: String | null
-  numericFieldCustomPrecisionScale_contains?: String | null
-  numericFieldCustomPrecisionScale_startsWith?: String | null
-  numericFieldCustomPrecisionScale_endsWith?: String | null
-  numericFieldCustomPrecisionScale_in?: String[] | String | null
+  numericField_eq?: BigInt | null
+  numericField_gt?: BigInt | null
+  numericField_gte?: BigInt | null
+  numericField_lt?: BigInt | null
+  numericField_lte?: BigInt | null
+  numericField_in?: BigInt[] | BigInt | null
+  numericFieldCustomPrecisionScale_eq?: BigInt | null
+  numericFieldCustomPrecisionScale_gt?: BigInt | null
+  numericFieldCustomPrecisionScale_gte?: BigInt | null
+  numericFieldCustomPrecisionScale_lt?: BigInt | null
+  numericFieldCustomPrecisionScale_lte?: BigInt | null
+  numericFieldCustomPrecisionScale_in?: BigInt[] | BigInt | null
   noSortField_eq?: String | null
   noSortField_contains?: String | null
   noSortField_startsWith?: String | null
@@ -414,6 +413,11 @@ export interface KitchenSinkWhereInput {
   arrayOfInts_containsAll?: Int[] | Int | null
   arrayOfInts_containsNone?: Int[] | Int | null
   arrayOfInts_containsAny?: Int[] | Int | null
+  dishes_none?: DishWhereInput | null
+  dishes_some?: DishWhereInput | null
+  dishes_every?: DishWhereInput | null
+  AND?: KitchenSinkWhereInput[] | KitchenSinkWhereInput | null
+  OR?: KitchenSinkWhereInput[] | KitchenSinkWhereInput | null
 }
 
 export interface KitchenSinkWhereUniqueInput {
@@ -540,9 +544,9 @@ export interface KitchenSink extends BaseGraphQLObject {
   typedJsonField?: EventObject | null
   idField?: String | null
   stringEnumField?: StringEnum | null
-  dishes?: Array<Dish> | null
-  numericField?: String | null
-  numericFieldCustomPrecisionScale?: String | null
+  dishes: Array<Dish>
+  numericField?: BigInt | null
+  numericFieldCustomPrecisionScale?: BigInt | null
   noFilterField?: String | null
   noSortField?: String | null
   noFilterOrSortField?: String | null
@@ -568,6 +572,11 @@ export interface PageInfo {
 export interface StandardDeleteResponse {
   id: ID_Output
 }
+
+/*
+GraphQL representation of BigInt
+*/
+export type BigInt = string
 
 /*
 The `Boolean` scalar type represents `true` or `false`.

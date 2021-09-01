@@ -92,7 +92,12 @@ export class KitchenSink extends BaseModel {
 
   @OneToMany(
     () => Dish,
-    (dish: Dish) => dish.kitchenSink
+    (dish: Dish) => dish.kitchenSink,
+    {
+      modelName: 'KitchenSink',
+      relModelName: 'Dish',
+      propertyName: 'dishes'
+    }
   )
   dishes!: Dish[];
 

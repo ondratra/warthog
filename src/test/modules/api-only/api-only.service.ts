@@ -8,7 +8,14 @@ export class ApiOnlyService {
     //
   }
 
-  find<T>(where?: any, orderBy?: string, limit?: number, offset?: number, fields?: string[]) {
+  //find<T>(where?: any, orderBy?: string, limit?: number, offset?: number, fields?: string[]) {
+  find<T>(
+    where?: any,
+    orderBy?: string | string[],
+    limit?: number,
+    offset?: number,
+    fields?: string[]
+  ) {
     console.log(where, orderBy, limit, offset, fields);
     return [] as ApiOnly[];
   }
