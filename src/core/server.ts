@@ -53,6 +53,7 @@ export interface ServerOptions<T> {
     queryTemplates?: IQueryTemplate[];
     version?: string;
     cdnUrl?: string;
+    subscriptionEndpoint?: string;
   };
   onBeforeGraphQLMiddleware?: (app: express.Application) => void;
   onAfterGraphQLMiddleware?: (app: express.Application) => void;
@@ -242,8 +243,11 @@ export class Server<C extends BaseContext> {
         ? {
             playground: {
               // this makes playground files to be served locally
-              version: this.appOptions.playgroundConfig?.version || '',
-              cdnUrl: this.appOptions.playgroundConfig?.cdnUrl || '',
+              version: this.appOptions.playgroundConfig?.version,
+              cdnUrl: this.appOptions.playgroundConfig?.cdnUrl,
+
+              // allow setting custom subscription endpoint
+              subscriptionEndpoint: this.appOptions.playgroundConfig?.subscriptionEndpoint,
 
               // pass custom query templates to playground
               queryTemplates: this.appOptions.playgroundConfig?.queryTemplates || []

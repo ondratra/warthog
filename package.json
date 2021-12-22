@@ -1,6 +1,6 @@
 {
   "name": "@joystream/warthog",
-  "version": "2.40.0",
+  "version": "2.41.0",
   "description": "Opinionated set of tools for setting up GraphQL backed by TypeORM",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
@@ -32,8 +32,7 @@
     "test:watch": "./tools/test.sh --watch"
   },
   "husky": {
-    "hooks": {
-    }
+    "hooks": {}
   },
   "repository": {
     "type": "git",
