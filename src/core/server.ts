@@ -242,9 +242,9 @@ export class Server<C extends BaseContext> {
       this.config.get('PLAYGROUND') === 'true'
         ? {
             playground: {
-              // this makes playground files to be served locally
-              version: this.appOptions.playgroundConfig?.version,
-              cdnUrl: this.appOptions.playgroundConfig?.cdnUrl,
+              // empty string '' for version and cdnUrl makes playground files to be served locally by default
+              version: this.appOptions.playgroundConfig?.version || '',
+              cdnUrl: this.appOptions.playgroundConfig?.cdnUrl || '',
 
               // allow setting custom subscription endpoint
               subscriptionEndpoint: this.appOptions.playgroundConfig?.subscriptionEndpoint,
