@@ -45,6 +45,7 @@ export interface ServerOptions<T> {
   pubSub?: PubSubEngine | PubSubOptions;
   openPlayground?: boolean;
   port?: string | number;
+  path?: string;
   resolversPath?: string[];
   warthogImportPath?: string;
   introspection?: boolean; // DEPRECATED
@@ -85,6 +86,9 @@ export class Server<C extends BaseContext> {
     }
     if (typeof this.appOptions.port !== 'undefined') {
       process.env.WARTHOG_APP_PORT = this.appOptions.port.toString();
+    }
+    if (typeof this.appOptions.path !== 'undefined') {
+      process.env.WARTHOG_APP_PATH = this.appOptions.path;
     }
     if (typeof this.appOptions.generatedFolder !== 'undefined') {
       process.env.WARTHOG_GENERATED_FOLDER = this.appOptions.generatedFolder;
@@ -148,7 +152,9 @@ export class Server<C extends BaseContext> {
   }
 
   getGraphQLServerUrl() {
-    return `${this.getServerUrl()}/graphql`;
+    const path = this.config.get('APP_PATH') || '/graphql'
+
+    return `${this.getServerUrl()}${path}`;
   }
 
   async getBinding(options: { origin?: string; token?: string } = {}): Promise<Binding> {
