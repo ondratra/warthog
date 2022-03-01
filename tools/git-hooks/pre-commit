@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+# test that project can be built
+yarn build
+
+# Lint has to be disabled until tests are fixed and eslint & prettier dependencies are upgraded
+# to latest versions, and configuration and code is adjusted.
+# Excluding test folders is not enough because of bug in currently used eslint verssion.
+# see https://stackoverflow.com/questions/62079477/line-0-parsing-error-cannot-read-property-map-of-undefined
+# yarn eslint './+(examples|src|test|tools)/**/*.{js,ts}'

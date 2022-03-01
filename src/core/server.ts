@@ -256,7 +256,7 @@ export class Server<C extends BaseContext> {
               // allow setting custom endpoint and subscription endpoint (usually will be the same)
               subscriptionEndpoint:
                 this.appOptions.playgroundConfig?.subscriptionEndpoint ||
-                this.appOptions.playgroundConfig?.endpoint.replace(/^http(s)?:/, 'ws$1:'),
+                this.appOptions.playgroundConfig?.endpoint?.replace(/^http(s)?:/, 'ws$1:'),
               endpoint: this.appOptions.playgroundConfig?.endpoint,
 
               // pass custom query templates to playground
@@ -306,7 +306,7 @@ export class Server<C extends BaseContext> {
     this.graphQLServer.applyMiddleware({
       app: this.expressApp,
       bodyParserConfig: this.bodyParserConfig,
-      path: this.config.get('APP_PATH') || '/graphql',
+      path: this.config.get('APP_PATH') || '/graphql'
     });
     debug('start:applyMiddleware:end');
 

@@ -32,7 +32,9 @@
     "test:watch": "./tools/test.sh --watch"
   },
   "husky": {
-    "hooks": {}
+    "hooks": {
+      "pre-commit": "./tools/git-hooks/pre-commit"
+    }
   },
   "repository": {
     "type": "git",
