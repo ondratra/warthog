@@ -148,6 +148,9 @@ export class ApiOnlyWhereInput {
 
   @TypeGraphQLField(() => ApiOnlyWhereInput, { nullable: true })
   OR?: [ApiOnlyWhereInput];
+
+  @TypeGraphQLField(() => ApiOnlyWhereInput, { nullable: true })
+  NOT?: [ApiOnlyWhereInput];
 }
 
 @TypeGraphQLInputType()
@@ -619,6 +622,9 @@ export class KitchenSinkWhereInput {
 
   @TypeGraphQLField(() => KitchenSinkWhereInput, { nullable: true })
   OR?: [KitchenSinkWhereInput];
+
+  @TypeGraphQLField(() => KitchenSinkWhereInput, { nullable: true })
+  NOT?: [KitchenSinkWhereInput];
 }
 
 @TypeGraphQLInputType()
@@ -946,6 +952,9 @@ export class DishWhereInput {
 
   @TypeGraphQLField(() => DishWhereInput, { nullable: true })
   OR?: [DishWhereInput];
+
+  @TypeGraphQLField(() => DishWhereInput, { nullable: true })
+  NOT?: [DishWhereInput];
 }
 
 @TypeGraphQLInputType()

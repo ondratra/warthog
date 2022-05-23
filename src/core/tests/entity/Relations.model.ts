@@ -23,7 +23,7 @@ export class Book extends BaseModel {
   starRating!: number;
 
   @ManyToOne(
-    () => Author,
+    () => Author, // eslint-disable-line @typescript-eslint/no-use-before-define
     (param: Author) => param.books,
     {
       skipGraphQLField: true,
@@ -36,7 +36,7 @@ export class Book extends BaseModel {
   author!: Author;
 
   @ManyToMany(
-    () => Library,
+    () => Library, // eslint-disable-line @typescript-eslint/no-use-before-define
     (param: Library) => param.books,
     {
       modelName: 'Book',
@@ -52,7 +52,7 @@ export class Book extends BaseModel {
   libraries!: Library[];
 
   @OneToOneJoin(
-    () => BookMetadata,
+    () => BookMetadata, // eslint-disable-line @typescript-eslint/no-use-before-define
     (param: BookMetadata) => param.book,
     {
       nullable: true,

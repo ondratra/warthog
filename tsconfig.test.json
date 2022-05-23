@@ -2,6 +2,8 @@
   "extends": "./tsconfig.json",
   "types": ["jest", "isomorphic-fetch", "node"],
   "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "target": "es5",
     "strict": false
   },
   "include": ["src/**/*", "test/**/*", "typings"],

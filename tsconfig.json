@@ -12,6 +12,7 @@
       "es2016",
       "dom",
       "es5",
+      "es6",
       "scripthost",
       "esnext",
       "esnext.asynciterable"
@@ -45,9 +46,9 @@
     "node_modules",
     "tmp",
     "**/node_modules/*",
-    // "src/**/*.test.ts",
-    "**/generated/*"
-    // "src/test/**/*"
+    "src/**/*.test.ts",
+    "**/generated/*",
+    "src/test/**/*"
   ],
   "include": [
     "src/**/*",

@@ -2,11 +2,14 @@ import { validate } from 'class-validator';
 import { ArgumentValidationError } from 'type-graphql';
 import {
   Brackets,
+  NotBrackets,
   DeepPartial,
   EntityManager,
+  FindOptionsWhere,
   getRepository,
   Repository,
-  SelectQueryBuilder
+  SelectQueryBuilder,
+  WhereExpressionBuilder
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
@@ -36,6 +39,7 @@ interface WhereFilterAttributes {
 type WhereExpression = {
   AND?: WhereExpression[];
   OR?: WhereExpression[];
+  NOT?: WhereExpression[];
 } & WhereFilterAttributes;
 
 export type LimitOffset = {
@@ -325,6 +329,7 @@ export class BaseService<E extends BaseModel> {
     // {
     //   AND?: WhereInput[];
     //   OR?: WhereInput[];
+    //   NOT?: WhereInput[];
     //   [key: string]: string | number | null;
     // }
     const processWhereInput = (
@@ -332,53 +337,67 @@ export class BaseService<E extends BaseModel> {
       qb: SelectQueryBuilder<E>,
       where: WhereExpression
     ): SelectQueryBuilder<E> => {
-      const { AND, OR, ...rest } = where;
-      if (AND && AND.length) {
-        const ands = AND.filter(value => JSON.stringify(value) !== '{}');
-        if (ands.length) {
-          qb.andWhere(
-            new Brackets(qb2 => {
-              ands.forEach((where: WhereExpression) => {
-                if (Object.keys(where).length === 0) {
-                  return; // disregard empty where objects
-                }
-                qb2.andWhere(
-                  new Brackets(qb3 => {
-                    processWhereInput(topLevelQb, qb3 as SelectQueryBuilder<any>, where);
-                    return qb3;
-                  })
-                );
-              });
-            })
-          );
+      const handleConditions = (
+        qb: SelectQueryBuilder<E>,
+        rawFilters: WhereExpression[] | undefined,
+        conditionFactory: (qb: WhereExpressionBuilder, whereInputProcessor: (qb: WhereExpressionBuilder) => WhereExpressionBuilder) => void,
+      ) => {
+        if (!rawFilters || !rawFilters.length) {
+          return;
         }
+
+        const filters = rawFilters.filter(value => JSON.stringify(value) !== '{}');
+        if (!filters.length) {
+          return;
+        }
+
+        const conditionedQbBrackets = new Brackets(qb2 => {
+          filters
+            .filter(value => Object.keys(value).length) // disregard empty where objects
+            .forEach((filterWhere: WhereExpression) => {
+              conditionFactory(qb2, qb3 => {
+                processWhereInput(topLevelQb, qb3 as SelectQueryBuilder<any>, filterWhere);
+                return qb3;
+              })
+            })
+        });
+
+        qb.andWhere(conditionedQbBrackets)
       }
 
-      if (OR && OR.length) {
-        const ors = OR.filter(value => JSON.stringify(value) !== '{}');
-        if (ors.length) {
-          qb.andWhere(
-            new Brackets(qb2 => {
-              ors.forEach((where: WhereExpression) => {
-                if (Object.keys(where).length === 0) {
-                  return; // disregard empty where objects
-                }
+      const { AND, OR, NOT, ...rest } = where;
 
-                qb2.orWhere(
-                  new Brackets(qb3 => {
-                    processWhereInput(topLevelQb, qb3 as SelectQueryBuilder<any>, where);
-                    return qb3;
-                  })
-                );
-              });
-            })
-          );
-        }
-      }
+      // AND conditions
+      handleConditions(
+        qb,
+        AND,
+        (qb2, whereInputProcessor) => qb2.andWhere(
+          new Brackets(whereInputProcessor)
+        )
+      )
+
+      // OR conditions
+      handleConditions(
+        qb,
+        OR,
+        (qb2, whereInputProcessor) => qb2.orWhere(
+          new Brackets(whereInputProcessor)
+        )
+      )
+
+      // NOT conditions
+      handleConditions(
+        qb,
+        NOT,
+        (qb2, whereInputProcessor) => qb2.andWhere(
+          new NotBrackets(whereInputProcessor)
+        )
+      )
 
       if (rest) {
         processWheres(topLevelQb, qb, rest);
       }
+
       return qb;
     };
 
@@ -418,9 +437,7 @@ export class BaseService<E extends BaseModel> {
       throw new ArgumentValidationError(errors);
     }
 
-    // TODO: remove any when this is fixed: https://github.com/Microsoft/TypeScript/issues/21592
-    // TODO: Fix `any`
-    return manager.save(entity as any, { reload: true });
+    return manager.save(entity, { reload: true });
   }
 
   async createMany(data: DeepPartial<E>[], userId: string, options?: BaseOptions): Promise<E[]> {
@@ -443,7 +460,7 @@ export class BaseService<E extends BaseModel> {
       }
     }
 
-    return manager.save(results, { reload: true });
+    return manager.save(results as E[], { reload: true });
   }
 
   // TODO: There must be a more succinct way to:
@@ -470,7 +487,7 @@ export class BaseService<E extends BaseModel> {
     }
 
     const result = await manager.save<E>(entity);
-    return manager.findOneOrFail(this.entityClass, result.id);
+    return manager.findOneByOrFail(this.entityClass, { id: result.id } as FindOptionsWhere<E>);
   }
 
   async delete<W extends object>(
@@ -490,7 +507,7 @@ export class BaseService<E extends BaseModel> {
       deletedAt: null
     };
 
-    const found = await manager.findOneOrFail<E>(this.entityClass, whereNotDeleted as any);
+    const found = await manager.findOneByOrFail<E>(this.entityClass, whereNotDeleted as any);
     const idData = ({ id: found.id } as any) as DeepPartial<E>;
     const entity = manager.merge<E>(this.entityClass, new this.entityClass(), data as any, idData);
 

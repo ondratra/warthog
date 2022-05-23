@@ -1,11 +1,11 @@
 type ApiOnly implements BaseGraphQLObject {
   id: ID!
   createdAt: DateTime!
-  createdById: String!
+  createdById: ID!
   updatedAt: DateTime
-  updatedById: String
+  updatedById: ID
   deletedAt: DateTime
-  deletedById: String
+  deletedById: ID
   version: Int!
   name: String!
 }
@@ -50,6 +50,7 @@ input ApiOnlyWhereInput {
   name_in: [String!]
   AND: [ApiOnlyWhereInput!]
   OR: [ApiOnlyWhereInput!]
+  NOT: [ApiOnlyWhereInput!]
 }
 
 input ApiOnlyWhereUniqueInput {
@@ -59,33 +60,33 @@ input ApiOnlyWhereUniqueInput {
 interface BaseGraphQLObject {
   id: ID!
   createdAt: DateTime!
-  createdById: String!
+  createdById: ID!
   updatedAt: DateTime
-  updatedById: String
+  updatedById: ID
   deletedAt: DateTime
-  deletedById: String
+  deletedById: ID
   version: Int!
 }
 
 type BaseModel implements BaseGraphQLObject {
   id: ID!
   createdAt: DateTime!
-  createdById: String!
+  createdById: ID!
   updatedAt: DateTime
-  updatedById: String
+  updatedById: ID
   deletedAt: DateTime
-  deletedById: String
+  deletedById: ID
   version: Int!
 }
 
 type BaseModelUUID implements BaseGraphQLObject {
   id: ID!
   createdAt: DateTime!
-  createdById: String!
+  createdById: ID!
   updatedAt: DateTime
-  updatedById: String
+  updatedById: ID
   deletedAt: DateTime
-  deletedById: String
+  deletedById: ID
   version: Int!
 }
 
@@ -131,11 +132,11 @@ scalar DateTime
 type DbOnly implements BaseGraphQLObject {
   id: ID!
   createdAt: DateTime!
-  createdById: String!
+  createdById: ID!
   updatedAt: DateTime
-  updatedById: String
+  updatedById: ID
   deletedAt: DateTime
-  deletedById: String
+  deletedById: ID
   version: Int!
   stringField: String!
 }
@@ -147,11 +148,11 @@ interface DeleteResponse {
 type Dish implements BaseGraphQLObject {
   id: ID!
   createdAt: DateTime!
-  createdById: String!
+  createdById: ID!
   updatedAt: DateTime
-  updatedById: String
+  updatedById: ID
   deletedAt: DateTime
-  deletedById: String
+  deletedById: ID
   version: Int!
   name: String!
   stringEnumField: StringEnum
@@ -232,6 +233,7 @@ input DishWhereInput {
   kitchenSink: KitchenSinkWhereInput
   AND: [DishWhereInput!]
   OR: [DishWhereInput!]
+  NOT: [DishWhereInput!]
 }
 
 input DishWhereUniqueInput {
@@ -266,11 +268,11 @@ scalar JSONObject
 type KitchenSink implements BaseGraphQLObject {
   id: ID!
   createdAt: DateTime!
-  createdById: String!
+  createdById: ID!
   updatedAt: DateTime
-  updatedById: String
+  updatedById: ID
   deletedAt: DateTime
-  deletedById: String
+  deletedById: ID
   version: Int!
 
   """This is a string field"""
@@ -530,6 +532,7 @@ input KitchenSinkWhereInput {
   dishes_every: DishWhereInput
   AND: [KitchenSinkWhereInput!]
   OR: [KitchenSinkWhereInput!]
+  NOT: [KitchenSinkWhereInput!]
 }
 
 input KitchenSinkWhereUniqueInput {
@@ -538,6 +541,7 @@ input KitchenSinkWhereUniqueInput {
 }
 
 type Mutation {
+  createManyDishs(data: [DishCreateInput!]!): [Dish!]!
   createKitchenSink(data: KitchenSinkCreateInput!): KitchenSink!
   createManyKitchenSinks(data: [KitchenSinkCreateInput!]!): [KitchenSink!]!
   updateKitchenSink(data: KitchenSinkUpdateInput!, where: KitchenSinkWhereUniqueInput!): KitchenSink!

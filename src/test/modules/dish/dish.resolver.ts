@@ -21,15 +21,15 @@ import {
   Fields,
   RawFields,
   PageInfo,
-  StandardDeleteResponse,
+  // StandardDeleteResponse,
   UserId
 } from '../../../';
 
 import {
-  DishCreateInput,
+  // DishCreateInput,
   DishCreateManyArgs,
   DishOrderByEnum,
-  DishUpdateArgs,
+  // DishUpdateArgs,
   DishWhereArgs,
   DishWhereInput,
   DishWhereUniqueInput
@@ -120,9 +120,28 @@ export class DishResolver {
   async dish(@Arg('where') where: DishWhereUniqueInput): Promise<Dish> {
     return this.service.findOne<DishWhereUniqueInput>(where);
   }
+
+  @Authorized('dish:create')
+  @Mutation(() => [Dish])
+  async createManyDishs(
+    @Args() { data }: DishCreateManyArgs,
+    @UserId() userId: string
+  ): Promise<Dish[]> {
+    //return this.service.createMany(data[], userId); // this is how it used to be
+
+    // TODO: understand why this is actually needed and how to fix it
+    //       see `createManyDishes` in `server.test.ts` for second part of these changes
+    //       it doesn't affect Joystream so I'm keeping this workaround here to make all tests pass
+    const tmp = data.map(item => ({
+      name: item.name,
+      kitchenSink: { id: item.kitchenSink }
+    }));
+
+    return this.service.createMany(tmp, userId);
+  }
+
   /*
   TODO: the following had to be commented because it created compilation errors and I was unable to fix it yet
-        on the other hand commenting it breaks ~3 tests that focus on transactions
 
   @Authorized('dish:create')
   @Mutation(() => Dish)

@@ -106,7 +106,7 @@ export function addQueryBuilderWhereItem<E>(
         // Adds: "user"."json_field"->'foo'->'bar'->>'my_baz' > 1
         addQueryBuilderWhereItem(
           qb,
-          columnWithAlias + key, // Make sure parameterKey used here is unique so that it doesn't get value from previous "where"
+          parameterKey + key, // Make sure parameterKey used here is unique so that it doesn't get value from previous "where"
           `${columnWithAlias}${pre}->>'${attr}'`,
           operator,
           val

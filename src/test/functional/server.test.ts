@@ -641,55 +641,6 @@ describe('server', () => {
     noSupertestRequestErrors(response);
   });
 
-  /*
-  describe('Transactions', () => {
-    test('create two dishes in transaction successfully', async done => {
-      expect.assertions(5);
-      const name = `Tx Success ${runKey}`;
-
-      const users = await callAPISuccess(
-        binding.mutation.successfulTransaction(
-          { data: { name, kitchenSinkId: kitchenSink.id } },
-          `{ id name }`
-        )
-      );
-
-      expect(users[0]).toBeDefined();
-      expect(users[0].name).toBe(name);
-
-      expect(users[1]).toBeDefined();
-      expect(users[1].name).toBe(`${name} Updated`);
-
-      const savedDishes = await binding.query.dishes({ where: { name_contains: name } }, '{ id }');
-      expect(savedDishes.length).toEqual(2);
-      done();
-    });
-
-    test('failed transaction should not save any items', async done => {
-      expect.assertions(2);
-      const name = `Tx Fail ${runKey}`;
-
-      const result = await callAPIError(
-        binding.mutation.failedTransaction(
-          { data: { name, kitchenSinkId: kitchenSink.id } },
-          `{ id name }`
-        )
-      );
-
-      expect(result.message).toBe('null value in column "name" violates not-null constraint');
-
-      let savedDishes: Dish[] = [];
-      try {
-        savedDishes = await binding.query.dishes({ where: { name_eq: name } }, '{ id }');
-      } catch (error) {
-        console.error('This should not have errored', savedDishes);
-      }
-      expect(savedDishes.length).toEqual(0);
-      done();
-    });
-  });
-  */
-
   describe('DB Decorator options', () => {
     let kitchenSinkDBColumns: string[];
     let stringFieldColumn: ColumnMetadata;
@@ -828,7 +779,7 @@ async function createManyDishes(binding: any, kitchenSinkId: string): Promise<Ki
   const data = Array.from({ length: 20 }, (v, i) => i).map(item => {
     return {
       name: `Dish ${item}`,
-      kitchenSinkId
+      kitchenSink: kitchenSinkId
     };
   });
   let dishes;

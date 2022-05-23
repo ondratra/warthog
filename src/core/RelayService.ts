@@ -69,6 +69,7 @@ interface WhereExpression {
 type WhereInput = {
   AND?: WhereInput[];
   OR?: WhereInput[];
+  NOT?: WhereInput[];
 } & WhereExpression;
 
 @Service()

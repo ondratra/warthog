@@ -86,11 +86,7 @@ module.exports = (toolbox: GluegunToolbox) => {
       // Set name to pascal case so that migration class names are pascaled (eslint)
       name = toolbox.strings.pascalCase(name);
 
-      const result = await runTypeORMCommand(
-        `migration:generate -n ${name}`,
-        toolbox,
-        `--dir ./${process.env.WARTHOG_DB_MIGRATIONS_DIR}`
-      );
+      const result = await runTypeORMCommand(`migration:generate`, toolbox, `${name}`);
 
       // If we don't run the command because of some other error, just return the error
       if (typeof result === 'string') {
@@ -108,11 +104,13 @@ module.exports = (toolbox: GluegunToolbox) => {
 async function runTypeORMCommand(command: string, toolbox: Toolbox, additionalParams = '') {
   const tsNodePath = path.join(process.cwd(), './node_modules/.bin/ts-node');
   const typeORMPath = path.join(process.cwd(), './node_modules/.bin/typeorm');
-  const ormConfigFullPath = path.join(String(process.env.WARTHOG_GENERATED_FOLDER), 'ormconfig.ts');
-  const relativeOrmConfigPath = path.relative(process.cwd(), ormConfigFullPath);
+  const dataSourceFullPath = path.join(
+    String(process.env.WARTHOG_GENERATED_FOLDER),
+    'data-source.ts'
+  );
 
-  if (toolbox.filesystem.isNotFile(ormConfigFullPath)) {
-    return `Cannot find ormconfig path: ${ormConfigFullPath}`;
+  if (toolbox.filesystem.isNotFile(dataSourceFullPath)) {
+    return `Cannot find dataSource path: ${dataSourceFullPath}`;
   }
 
   // Ok running this command from within the CLI is finicky
@@ -124,7 +122,7 @@ async function runTypeORMCommand(command: string, toolbox: Toolbox, additionalPa
   //
   // 2. We need to make sure that all TYPEORM_ environment variables are pulled out of process.env so that
   //    TypeORM doesn't skip loading the ormconfig file
-  const cmd = `${tsNodePath} ${typeORMPath} ${command}  --config ${relativeOrmConfigPath} ${additionalParams}`;
+  const cmd = `${tsNodePath} ${typeORMPath} ${command} --dataSource ${dataSourceFullPath} ${additionalParams}`;
 
   const filteredEnv = filteredProcessEnv();
   const result = await exec(cmd, { env: filteredEnv });
