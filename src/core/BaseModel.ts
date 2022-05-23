@@ -18,17 +18,17 @@ export abstract class BaseGraphQLObject {
   @Field(() => ID)
   id!: IDType;
 
-  @Field() createdAt!: Date;
-  @Field() createdById?: IDType;
+  @Field(() => Date) createdAt!: Date;
+  @Field(() => ID) createdById?: IDType;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   updatedAt?: Date;
-  @Field({ nullable: true })
+  @Field(() => ID, { nullable: true })
   updatedById?: IDType;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   deletedAt?: Date;
-  @Field({ nullable: true })
+  @Field(() => ID, { nullable: true })
   deletedById?: IDType;
 
   @Field(() => Int)

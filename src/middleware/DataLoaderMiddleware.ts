@@ -1,4 +1,4 @@
-import DataLoader = require('dataloader');
+import * as DataLoader from 'dataloader';
 import { MiddlewareInterface, NextFn, ResolverData } from 'type-graphql';
 import { Service } from 'typedi';
 

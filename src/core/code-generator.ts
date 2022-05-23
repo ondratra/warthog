@@ -49,6 +49,7 @@ export class CodeGenerator {
       await this.writeGeneratedIndexFile();
       await this.writeGeneratedTSTypes();
       await this.writeOrmConfig();
+      await this.writeDataSourceConfig();
       await this.writeSchemaFile();
       await this.generateBinding();
     } catch (error) {
@@ -133,6 +134,19 @@ export class CodeGenerator {
 module.exports = getBaseConfig();`;
 
     return this.writeToGeneratedFolder('ormconfig.ts', contents);
+  }
+
+  private async writeDataSourceConfig() {
+    const contents = `import 'reflect-metadata'
+import { DataSource, DataSourceOptions } from 'typeorm'
+import { getBaseConfig } from '${this.options.warthogImportPath}'
+
+export const AppDataSource = new DataSource({
+    ...getBaseConfig()
+} as DataSourceOptions)
+`;
+
+    return this.writeToGeneratedFolder('data-source.ts', contents);
   }
 
   private async writeToGeneratedFolder(filename: string, contents: string) {

@@ -53,7 +53,7 @@ describe('cli functional tests', () => {
     );
 
     // TODO: should we bother with this since we don't update the version in package.json?
-    expect(output).toContain('0.0.0-development');
+    expect(output).toContain('2.41.5');
     // This makes sure we're actually getting the version command and not the standard "help" command, which also includes the version
     expect(output).not.toContain('help');
     done();
@@ -246,7 +246,7 @@ describe('cli functional tests', () => {
 
     await callWarthogCLI('db:migrate:generate --name cli_test_db_migration');
     const stdout = spy.getStdOutErr();
-    expect(stdout).toContain('-CliTestDbMigration.ts');
+    expect(stdout).toContain('CliTestDbMigration.ts');
     expect(stdout).toContain('has been generated successfully.');
 
     const migrationDir = String(process.env.WARTHOG_DB_MIGRATIONS_DIR);

@@ -4,7 +4,7 @@
 import { ApolloServer, OptionsJson, ApolloServerExpressConfig } from 'apollo-server-express';
 import { PubSubEngine, PubSubOptions } from 'graphql-subscriptions';
 import { Request } from 'express';
-import express = require('express');
+import * as express from 'express';
 import { GraphQLID, GraphQLSchema } from 'graphql';
 import { Binding } from 'graphql-binding';
 import { DateResolver } from 'graphql-scalars';

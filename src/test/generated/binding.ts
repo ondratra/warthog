@@ -14,6 +14,7 @@ export interface Query {
   }
 
 export interface Mutation {
+    createManyDishs: <T = Array<Dish>>(args: { data: Array<DishCreateInput> }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     createKitchenSink: <T = KitchenSink>(args: { data: KitchenSinkCreateInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     createManyKitchenSinks: <T = Array<KitchenSink>>(args: { data: Array<KitchenSinkCreateInput> }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
     updateKitchenSink: <T = KitchenSink>(args: { data: KitchenSinkUpdateInput, where: KitchenSinkWhereUniqueInput }, info?: GraphQLResolveInfo | string, options?: Options) => Promise<T> ,
@@ -143,6 +144,7 @@ export interface ApiOnlyWhereInput {
   name_in?: String[] | String | null
   AND?: ApiOnlyWhereInput[] | ApiOnlyWhereInput | null
   OR?: ApiOnlyWhereInput[] | ApiOnlyWhereInput | null
+  NOT?: ApiOnlyWhereInput[] | ApiOnlyWhereInput | null
 }
 
 export interface ApiOnlyWhereUniqueInput {
@@ -220,6 +222,7 @@ export interface DishWhereInput {
   kitchenSink?: KitchenSinkWhereInput | null
   AND?: DishWhereInput[] | DishWhereInput | null
   OR?: DishWhereInput[] | DishWhereInput | null
+  NOT?: DishWhereInput[] | DishWhereInput | null
 }
 
 export interface DishWhereUniqueInput {
@@ -418,6 +421,7 @@ export interface KitchenSinkWhereInput {
   dishes_every?: DishWhereInput | null
   AND?: KitchenSinkWhereInput[] | KitchenSinkWhereInput | null
   OR?: KitchenSinkWhereInput[] | KitchenSinkWhereInput | null
+  NOT?: KitchenSinkWhereInput[] | KitchenSinkWhereInput | null
 }
 
 export interface KitchenSinkWhereUniqueInput {
@@ -428,11 +432,11 @@ export interface KitchenSinkWhereUniqueInput {
 export interface BaseGraphQLObject {
   id: ID_Output
   createdAt: DateTime
-  createdById: String
+  createdById: ID_Output
   updatedAt?: DateTime | null
-  updatedById?: String | null
+  updatedById?: ID_Output | null
   deletedAt?: DateTime | null
-  deletedById?: String | null
+  deletedById?: ID_Output | null
   version: Int
 }
 
@@ -443,11 +447,11 @@ export interface DeleteResponse {
 export interface ApiOnly extends BaseGraphQLObject {
   id: ID_Output
   createdAt: DateTime
-  createdById: String
+  createdById: ID_Output
   updatedAt?: DateTime | null
-  updatedById?: String | null
+  updatedById?: ID_Output | null
   deletedAt?: DateTime | null
-  deletedById?: String | null
+  deletedById?: ID_Output | null
   version: Int
   name: String
 }
@@ -455,33 +459,33 @@ export interface ApiOnly extends BaseGraphQLObject {
 export interface BaseModel extends BaseGraphQLObject {
   id: ID_Output
   createdAt: DateTime
-  createdById: String
+  createdById: ID_Output
   updatedAt?: DateTime | null
-  updatedById?: String | null
+  updatedById?: ID_Output | null
   deletedAt?: DateTime | null
-  deletedById?: String | null
+  deletedById?: ID_Output | null
   version: Int
 }
 
 export interface BaseModelUUID extends BaseGraphQLObject {
   id: ID_Output
   createdAt: DateTime
-  createdById: String
+  createdById: ID_Output
   updatedAt?: DateTime | null
-  updatedById?: String | null
+  updatedById?: ID_Output | null
   deletedAt?: DateTime | null
-  deletedById?: String | null
+  deletedById?: ID_Output | null
   version: Int
 }
 
 export interface DbOnly extends BaseGraphQLObject {
   id: ID_Output
   createdAt: DateTime
-  createdById: String
+  createdById: ID_Output
   updatedAt?: DateTime | null
-  updatedById?: String | null
+  updatedById?: ID_Output | null
   deletedAt?: DateTime | null
-  deletedById?: String | null
+  deletedById?: ID_Output | null
   version: Int
   stringField: String
 }
@@ -489,11 +493,11 @@ export interface DbOnly extends BaseGraphQLObject {
 export interface Dish extends BaseGraphQLObject {
   id: ID_Output
   createdAt: DateTime
-  createdById: String
+  createdById: ID_Output
   updatedAt?: DateTime | null
-  updatedById?: String | null
+  updatedById?: ID_Output | null
   deletedAt?: DateTime | null
-  deletedById?: String | null
+  deletedById?: ID_Output | null
   version: Int
   name: String
   stringEnumField?: StringEnum | null
@@ -525,11 +529,11 @@ export interface EventParam {
 export interface KitchenSink extends BaseGraphQLObject {
   id: ID_Output
   createdAt: DateTime
-  createdById: String
+  createdById: ID_Output
   updatedAt?: DateTime | null
-  updatedById?: String | null
+  updatedById?: ID_Output | null
   deletedAt?: DateTime | null
-  deletedById?: String | null
+  deletedById?: ID_Output | null
   version: Int
   stringField: String
   nullableStringField?: String | null

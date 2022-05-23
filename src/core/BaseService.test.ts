@@ -67,11 +67,12 @@ describe('BaseService', () => {
           { firstName_contains: 'J' },
           { firstName_contains: 'K' }
         ],
-        AND: [{ lastName_contains: '0' }]
+        AND: [{ lastName_contains: '0' }],
+        NOT: [{ firstName_contains: 'C' }]
       } as any)
       .getMany();
 
-    expect(results.length).toEqual(5);
+    expect(results.length).toEqual(4);
   });
 
   describe('findConnection', () => {
