@@ -21,7 +21,7 @@ const debug = Debug('warthog:code-generators');
 const writeFilePromise = util.promisify(writeFile);
 
 interface CodeGeneratorOptions {
-  resolversPath: string[];
+  resolversPath: [string, ...string[]];
   validateResolvers?: boolean;
   warthogImportPath?: string;
 }
