@@ -175,7 +175,7 @@ export class DishResolver {
   ): Promise<StandardDeleteResponse> {
     return this.service.delete(where, userId);
   }
-
+/*
   @Mutation(() => [Dish])
   async successfulTransaction(
     @Arg('data') data: DishCreateInput,

@@ -22,7 +22,7 @@ export default {
       }).generate();
     } catch (error) {
       logger.error(error);
-      if (error.name.indexOf('Cannot determine GraphQL input type') > -1) {
+      if ((error as Error).name.indexOf('Cannot determine GraphQL input type') > -1) {
         logger.error('This often means you have multiple versions of TypeGraphQL installed.');
       }
     }

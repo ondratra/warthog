@@ -447,7 +447,7 @@ export class BaseService<E extends BaseModel> {
       return { ...item, createdById: userId };
     });
 
-    const results = manager.create(this.entityClass, data);
+    const results = manager.create<E>(this.entityClass, data);
 
     // Validate against the the data model
     // Without `skipMissingProperties`, some of the class-validator validations (like MinLength)
@@ -476,7 +476,7 @@ export class BaseService<E extends BaseModel> {
     options?: BaseOptions
   ): Promise<E> {
     const manager = options?.manager ?? this.manager;
-    const found = await this.findOne(where);
+    const found = await this.findOne(where as Partial<E>);
     const mergeData = ({ id: found.id, updatedById: userId } as any) as DeepPartial<E>;
     const entity = manager.merge<E>(this.entityClass, new this.entityClass(), data, mergeData);
 
