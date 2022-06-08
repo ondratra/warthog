@@ -1,7 +1,7 @@
 const caller = require('caller'); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as path from 'path';
 import { ObjectType as TypeGraphQLObjectType } from 'type-graphql';
-import { ObjectOptions } from 'type-graphql/dist/decorators/ObjectType.d';
+import { ObjectTypeOptions } from 'type-graphql/dist/decorators/ObjectType.d';
 
 import { ClassType } from '../core';
 import { getMetadataStorage } from '../metadata';
@@ -9,7 +9,7 @@ import { ClassDecoratorFactory, composeClassDecorators, generatedFolderPath } fr
 
 // Allow default TypeORM and TypeGraphQL options to be used
 // export function Model({ api = {}, db = {}, apiOnly = false, dbOnly = false }: ModelOptions = {}) {
-export function ObjectType(options: ObjectOptions = {}) {
+export function ObjectType(options: ObjectTypeOptions = {}) {
   // In order to use the enums in the generated classes file, we need to
   // save their locations and import them in the generated file
   const modelFileName = caller();
@@ -30,7 +30,7 @@ export function ObjectType(options: ObjectOptions = {}) {
 
   // We shouldn't add this as it creates the GraphQL type, but there is a
   // bug if we don't add it because we end up adding the Field decorators in the models
-  factories.push(TypeGraphQLObjectType(options as ObjectOptions) as ClassDecoratorFactory);
+  factories.push(TypeGraphQLObjectType(options as ObjectTypeOptions) as ClassDecoratorFactory);
 
   return composeClassDecorators(...factories);
 }

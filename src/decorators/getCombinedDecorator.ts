@@ -32,7 +32,8 @@ export function getCombinedDecorator<T extends Partial<ColumnMetadata>>({
     typeof warthogColumnMeta.description !== 'undefined'
       ? { description: warthogColumnMeta.description }
       : {};
-  const arrayOption = (warthogColumnMeta as any).array ? { array: true } : {};
+  const isArray = !!(warthogColumnMeta as any).array;
+  const arrayOption = isArray ? { array: true } : {};
 
   // TODO: Enable this when TypeORM is fixed: https://github.com/typeorm/typeorm/issues/5906
   // const typeOrmColumnOption =
@@ -54,8 +55,11 @@ export function getCombinedDecorator<T extends Partial<ColumnMetadata>>({
   // TypeGraphQL: next add the type-graphql decorator that generates the GraphQL type (or field within that type)
   // If an object is only writeable, don't add the `Field` decorators that will add it to the GraphQL type
   if (exposeAPI && !warthogColumnMeta.writeonly) {
+    const getGraphqlField =
+      isArray && !Array.isArray(gqlFieldType) ? () => [gqlFieldType] : () => gqlFieldType;
+
     decorators.push(
-      TypeGraphQLField(() => gqlFieldType, {
+      TypeGraphQLField(getGraphqlField, {
         ...nullableOption,
         ...defaultOption,
         ...tgqlDescriptionOption

@@ -125,7 +125,7 @@ describe('server', () => {
   test('queries for dishes with pagination', async () => {
     const { totalCount, edges, pageInfo } = await callAPISuccess(
       binding.query.dishConnection(
-        { orderBy: 'name_ASC', first: 1 },
+        { orderBy: ['name_ASC'], first: 1 },
         `{
             totalCount
             edges {
@@ -204,7 +204,7 @@ describe('server', () => {
 
     // Ensure that the raw error is useless. If this ever breaks and gives back a lot of
     // useful info, we can get rid of getBindingError and just use the vanilla error
-    expect(Object.keys(originalError)).toEqual(['message', 'locations', 'path']);
+    expect(Object.keys(originalError)).toEqual(['message', 'path']);
 
     // Note: this should likely not be an INTERNAL_SERVER_ERROR since it's based on bad user input
     expect(improvedError.message).toEqual('Argument Validation Error');

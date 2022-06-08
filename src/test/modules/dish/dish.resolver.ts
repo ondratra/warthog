@@ -83,8 +83,8 @@ export class DishConnectionWhereArgs extends ConnectionPageInputOptions {
   @Field(() => DishWhereInput, { nullable: true })
   where?: DishWhereInput;
 
-  @Field(() => DishOrderByEnum, { nullable: true })
-  orderBy?: DishOrderByEnum;
+  @Field(() => [DishOrderByEnum], { nullable: true })
+  orderBy?: DishOrderByEnum[];
 }
 
 @Resolver(Dish)
