@@ -1,7 +1,7 @@
 const caller = require('caller'); // eslint-disable-line @typescript-eslint/no-var-requires
 import * as path from 'path';
 import { ObjectType } from 'type-graphql';
-import { ObjectOptions } from 'type-graphql/dist/decorators/ObjectType.d';
+import { ObjectTypeOptions } from 'type-graphql/dist/decorators/ObjectType.d';
 import { Entity, EntityOptions } from 'typeorm';
 
 import { ClassType } from '../core';
@@ -9,7 +9,7 @@ import { getMetadataStorage } from '../metadata';
 import { ClassDecoratorFactory, composeClassDecorators, generatedFolderPath } from '../utils/';
 
 interface ModelOptions {
-  api?: ObjectOptions | false;
+  api?: ObjectTypeOptions | false;
   db?: EntityOptions | false;
   apiOnly?: boolean;
   dbOnly?: boolean;
@@ -53,7 +53,7 @@ export function Model({ api = {}, db = {}, apiOnly = false, dbOnly = false }: Mo
 
   // We shouldn't add this as it creates the GraphQL type, but there is a
   // bug if we don't add it because we end up adding the Field decorators in the models
-  factories.push(ObjectType(api as ObjectOptions) as ClassDecoratorFactory);
+  factories.push(ObjectType(api as ObjectTypeOptions) as ClassDecoratorFactory);
 
   return composeClassDecorators(...factories);
 }

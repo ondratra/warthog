@@ -93,7 +93,6 @@
     "graphql-import-node": "^0.0.4",
     "graphql-iso-date": "^3.6.1",
     "graphql-scalars": "^1.2.6",
-    "graphql-tools": "^4.0.6",
     "graphql-type-json": "^0.3.0",
     "lodash": "^4.17.15",
     "mkdirp": "^0.5.1",
@@ -104,7 +103,7 @@
     "prettier": "^1.19.1",
     "reflect-metadata": "^0.1.13",
     "shortid": "^2.2.15",
-    "type-graphql": "^0.17.5",
+    "type-graphql": "^1.1.1",
     "typedi": "^0.8.0",
     "typeorm": "https://github.com/Joystream/typeorm/releases/download/0.3.5/typeorm-v0.3.5.tgz",
     "typeorm-typedi-extensions": "^0.4.1",
@@ -192,6 +191,8 @@
   "resolutions": {
     "//": "Fixes security vulnerability",
     "graphql": "^15.8.0",
+    "graphql-tools": "4.0.8",
+    "is-windows": "^1.0.2",
     "set-value": "2.0.1"
   },
   "release": {

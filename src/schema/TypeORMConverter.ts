@@ -529,13 +529,13 @@ export function entityToWhereInput(model: ModelMetadata): string {
     @TypeGraphQLInputType()
     export class ${classDeclaration} {
       ${fieldTemplates}
-      @TypeGraphQLField(() => ${model.name}WhereInput, { nullable: true })
+      @TypeGraphQLField(() => [${model.name}WhereInput], { nullable: true })
       AND?: [${model.name}WhereInput];
 
-      @TypeGraphQLField(() => ${model.name}WhereInput, { nullable: true })
+      @TypeGraphQLField(() => [${model.name}WhereInput], { nullable: true })
       OR?: [${model.name}WhereInput];
 
-      @TypeGraphQLField(() => ${model.name}WhereInput, { nullable: true })
+      @TypeGraphQLField(() => [${model.name}WhereInput], { nullable: true })
       NOT?: [${model.name}WhereInput];
     }
   `;
@@ -548,8 +548,8 @@ export function entityToWhereArgs(model: ModelMetadata): string {
       @TypeGraphQLField(() => ${model.name}WhereInput, { nullable: true })
       where?: ${model.name}WhereInput;
 
-      @TypeGraphQLField(() => ${model.name}OrderByEnum, { nullable: true })
-      orderBy?: ${model.name}OrderByEnum[];
+      @TypeGraphQLField(() => [${model.name}OrderByEnum], { nullable: true })
+      orderBy?: [${model.name}OrderByEnum];
     }
   `;
 }
