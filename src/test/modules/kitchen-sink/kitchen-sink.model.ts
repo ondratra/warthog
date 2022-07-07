@@ -22,7 +22,7 @@ import {
   NumericField,
   ObjectType,
   OneToMany,
-  StringField
+  StringField,
 } from '../../../';
 import { Dish } from '../dish/dish.model';
 import { StringEnum } from '../shared';
@@ -90,15 +90,11 @@ export class KitchenSink extends BaseModel {
   @EnumField('StringEnum', StringEnum, { nullable: true })
   stringEnumField?: StringEnum;
 
-  @OneToMany(
-    () => Dish,
-    (dish: Dish) => dish.kitchenSink,
-    {
-      modelName: 'KitchenSink',
-      relModelName: 'Dish',
-      propertyName: 'dishes'
-    }
-  )
+  @OneToMany(() => Dish, (dish: Dish) => dish.kitchenSink, {
+    modelName: 'KitchenSink',
+    relModelName: 'Dish',
+    propertyName: 'dishes',
+  })
   dishes!: Dish[];
 
   @Column({ nullable: true })
@@ -130,19 +126,19 @@ export class KitchenSink extends BaseModel {
 
   @CustomField({
     api: { type: 'string', nullable: true, sort: false, filter: false },
-    db: { type: 'text', nullable: true }
+    db: { type: 'text', nullable: true },
   })
   customTextFieldNoSortOrFilter?: string;
 
   @CustomField({
     api: { type: 'string', nullable: true, sort: false, filter: false },
-    db: { type: 'text', nullable: true, array: true }
+    db: { type: 'text', nullable: true, array: true },
   })
   customFieldArrayColumn?: string[];
 
   @CustomField({
     api: { type: 'string', nullable: true, sort: false, filter: false, readonly: true },
-    db: { type: 'text', nullable: true, default: 'foobar' }
+    db: { type: 'text', nullable: true, default: 'foobar' },
   })
   customTextFieldReadOnly?: string;
 

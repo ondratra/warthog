@@ -8,7 +8,7 @@ import {
   UserUpdateArgs,
   UserWhereArgs,
   UserWhereInput,
-  UserWhereUniqueInput
+  UserWhereUniqueInput,
 } from '../generated';
 
 import { Post } from './post.model';

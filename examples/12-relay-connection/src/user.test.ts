@@ -10,21 +10,21 @@ const server = getServer({}, { logging: false });
 const runKey = new Date().getTime();
 let binding: Binding;
 
-beforeAll(async done => {
+beforeAll(async (done) => {
   jest.setTimeout(20000);
 
   await server.start();
-  binding = ((await server.getBinding()) as unknown) as Binding; // TODO: clean this up
+  binding = (await server.getBinding()) as unknown as Binding; // TODO: clean this up
   done();
 });
 
-afterAll(async done => {
+afterAll(async (done) => {
   await server.stop();
   done();
 });
 
 describe('Users', () => {
-  test('create two users in transaction successfully', async done => {
+  test('create two users in transaction successfully', async (done) => {
     expect.assertions(3);
     const FIRSTNAME = `Homer ${runKey}`;
 
@@ -41,7 +41,7 @@ describe('Users', () => {
     done();
   });
 
-  test('failed transaction should not save any items', async done => {
+  test('failed transaction should not save any items', async (done) => {
     expect.assertions(1);
     const FIRSTNAME = `Bart ${runKey}`;
 

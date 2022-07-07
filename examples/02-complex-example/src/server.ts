@@ -13,7 +13,7 @@ interface Context extends BaseContext {
 }
 
 function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function getServer(AppOptions = {}, dbOptions = {}) {
@@ -28,12 +28,12 @@ export function getServer(AppOptions = {}, dbOptions = {}) {
           user: {
             email: 'admin@test.com',
             id: 'abc12345',
-            permissions: ['user:read', 'user:update', 'user:create', 'user:delete', 'photo:delete']
-          }
+            permissions: ['user:read', 'user:update', 'user:create', 'user:delete', 'photo:delete'],
+          },
         });
       },
       logger: customLogger,
-      ...AppOptions
+      ...AppOptions,
     },
     dbOptions
   );

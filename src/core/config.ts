@@ -24,7 +24,7 @@ const CONFIG_VALUE_VALID_KEYS = [
   'cliGeneratePath',
   'moduleImportPath',
   'resolversPath',
-  'validateResolvers'
+  'validateResolvers',
 ];
 
 interface StaticConfigFile {
@@ -89,7 +89,7 @@ export class Config {
       // Prevent 502s from happening in AWS and GCP (and probably other Production ENVs)
       // See https://shuheikagawa.com/blog/2019/04/25/keep-alive-timeout/
       WARTHOG_KEEP_ALIVE_TIMEOUT_MS: 30000,
-      WARTHOG_HEADERS_TIMEOUT_MS: 60000
+      WARTHOG_HEADERS_TIMEOUT_MS: 60000,
     };
 
     this.devDefaults = {
@@ -99,7 +99,7 @@ export class Config {
       WARTHOG_AUTO_GENERATE_FILES: 'true',
       WARTHOG_AUTO_OPEN_PLAYGROUND: 'true',
       WARTHOG_DB_HOST: 'localhost',
-      WARTHOG_DB_LOGGING: 'all'
+      WARTHOG_DB_LOGGING: 'all',
     };
 
     this.testDefaults = {
@@ -110,7 +110,7 @@ export class Config {
       WARTHOG_AUTO_OPEN_PLAYGROUND: 'false',
       WARTHOG_DB_DATABASE: 'warthog-test',
       WARTHOG_DB_HOST: 'localhost',
-      WARTHOG_DB_USERNAME: 'postgres'
+      WARTHOG_DB_USERNAME: 'postgres',
     };
 
     const dotenvPath = options.dotenvPath || this.PROJECT_ROOT;
@@ -146,7 +146,7 @@ export class Config {
       const filepath = path.join(dotenvPath, filename);
       if (fs.existsSync(filepath)) {
         dotenv.config({
-          path: filepath
+          path: filepath,
         });
       }
     });
@@ -169,7 +169,7 @@ export class Config {
       ...testOptions,
       ...configFile,
       ...this.typeORMToWarthogEnvVariables(),
-      ...this.warthogEnvVariables()
+      ...this.warthogEnvVariables(),
     };
 
     // If Jest is running, be smart and don't open playground
@@ -230,7 +230,7 @@ export class Config {
       'WARTHOG_DB_ENTITIES',
       'WARTHOG_DB_MIGRATIONS',
       'WARTHOG_DB_SUBSCRIBERS',
-      'WARTHOG_RESOLVERS_PATH'
+      'WARTHOG_RESOLVERS_PATH',
     ];
 
     const pathTypes = ['WARTHOG_GENERATED_FOLDER'];
@@ -336,7 +336,7 @@ export class Config {
     }
 
     const userConfigKeys = Object.keys(results.config);
-    const badKeys = userConfigKeys.filter(x => !CONFIG_VALUE_VALID_KEYS.includes(x));
+    const badKeys = userConfigKeys.filter((x) => !CONFIG_VALUE_VALID_KEYS.includes(x));
     if (badKeys.length) {
       throw new Error(
         `Config: invalid keys specified in ${results.filepath}: [${badKeys.join(', ')}]`

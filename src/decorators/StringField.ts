@@ -25,7 +25,7 @@ export function StringField(options: StringFieldOptions = {}): any {
     warthogColumnMeta: options,
     gqlFieldType: String,
     dbType: options.dataType || 'varchar',
-    dbColumnOptions: { ...maxLenOption, ...uniqueOption }
+    dbColumnOptions: { ...maxLenOption, ...uniqueOption },
   });
 
   if (options.minLength) {

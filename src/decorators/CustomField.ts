@@ -49,7 +49,7 @@ export function CustomField(args: CustomFieldOptions): any {
     apiOnly,
     editable,
     dbOnly,
-    writeonly
+    writeonly,
   };
   const graphQLType = args.db.array
     ? [columnTypeToGraphQLType(args.api.type)]

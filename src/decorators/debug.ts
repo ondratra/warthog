@@ -11,7 +11,7 @@ export function debug(key: string): MethodDecorator {
     const originalMethod = descriptor.value;
 
     if (util.types.isAsyncFunction(originalMethod)) {
-      descriptor.value = async function(...args: unknown[]): Promise<any> {
+      descriptor.value = async function (...args: unknown[]): Promise<any> {
         logger(`Entering ${propertyKey} with args: ${JSON.stringify(args)}`);
         const start = performance.now();
         const result = await originalMethod.apply(this, args);
@@ -20,7 +20,7 @@ export function debug(key: string): MethodDecorator {
         return result;
       };
     } else {
-      descriptor.value = function(...args: unknown[]) {
+      descriptor.value = function (...args: unknown[]) {
         logger(`Entering ${propertyKey} with args: ${JSON.stringify(args)}`);
         const start = performance.now();
         const result = originalMethod.apply(this, args);

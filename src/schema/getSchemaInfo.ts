@@ -3,7 +3,7 @@ import {
   getIntrospectionQuery,
   graphql,
   IntrospectionObjectType,
-  IntrospectionSchema
+  IntrospectionSchema,
 } from 'graphql';
 import { buildSchema, BuildSchemaOptions } from 'type-graphql';
 
@@ -20,14 +20,14 @@ export async function getSchemaInfo(options: BuildSchemaOptions) {
 
   const schemaIntrospection = result.data.__schema as IntrospectionSchema;
   const queryType = schemaIntrospection.types.find(
-    type => type.name === schemaIntrospection.queryType.name
+    (type) => type.name === schemaIntrospection.queryType.name
   ) as IntrospectionObjectType;
 
   const mutationTypeNameRef = schemaIntrospection.mutationType;
   let mutationType: IntrospectionObjectType | undefined;
   if (mutationTypeNameRef) {
     mutationType = schemaIntrospection.types.find(
-      type => type.name === mutationTypeNameRef.name
+      (type) => type.name === mutationTypeNameRef.name
     ) as IntrospectionObjectType;
   }
 
@@ -35,7 +35,7 @@ export async function getSchemaInfo(options: BuildSchemaOptions) {
   let subscriptionType: IntrospectionObjectType | undefined;
   if (subscriptionTypeNameRef) {
     subscriptionType = schemaIntrospection.types.find(
-      type => type.name === subscriptionTypeNameRef.name
+      (type) => type.name === subscriptionTypeNameRef.name
     ) as IntrospectionObjectType;
   }
 
@@ -44,6 +44,6 @@ export async function getSchemaInfo(options: BuildSchemaOptions) {
     queryType,
     schema,
     schemaIntrospection,
-    subscriptionType
+    subscriptionType,
   };
 }

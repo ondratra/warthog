@@ -15,7 +15,7 @@ export function InterfaceType(options: InterfaceOptions = {}) {
 
   const factories = [
     TypeGraphQLInterfaceType(options) as ClassDecoratorFactory,
-    registerWithWarthog as ClassDecoratorFactory
+    registerWithWarthog as ClassDecoratorFactory,
   ];
 
   return composeClassDecorators(...factories);

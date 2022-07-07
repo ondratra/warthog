@@ -23,7 +23,7 @@ export function DateOnlyField(options: DateOnlyFieldOptions = {}): any {
     warthogColumnMeta: options,
     gqlFieldType: DateResolver,
     dbType: 'date',
-    dbColumnOptions: { ...nullableOption, ...defaultOption }
+    dbColumnOptions: { ...nullableOption, ...defaultOption },
   });
 
   return composeMethodDecorators(...factories);

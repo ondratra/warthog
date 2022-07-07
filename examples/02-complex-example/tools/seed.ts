@@ -17,21 +17,18 @@ async function seedDatabase() {
 
   let binding: Binding;
   try {
-    binding = ((await server.getBinding()) as unknown) as Binding;
+    binding = (await server.getBinding()) as unknown as Binding;
   } catch (error) {
     logger.error(error);
     return process.exit(1);
   }
 
   for (let index = 0; index < NUM_USERS; index++) {
-    const random = new Date()
-      .getTime()
-      .toString()
-      .substring(8, 13);
+    const random = new Date().getTime().toString().substring(8, 13);
     const stringField = `${Faker.name.firstName()} ${Faker.name.lastName()}`;
-    const emailField = `${stringField
-      .substring(0, 1)
-      .toLowerCase()}${Faker.name.firstName().toLowerCase()}-${random}@fakeemail.com`;
+    const emailField = `${stringField.substring(0, 1).toLowerCase()}${Faker.name
+      .firstName()
+      .toLowerCase()}-${random}@fakeemail.com`;
 
     const jsonField = {
       string: 'hello',
@@ -39,7 +36,7 @@ async function seedDatabase() {
       bool: false,
       number: 1,
       emptyObject: {},
-      emptyArray: []
+      emptyArray: [],
     };
     const dateField = new Date().toISOString();
     const dateOnlyField = new Date().toISOString().substring(0, 10);
@@ -69,9 +66,9 @@ async function seedDatabase() {
                 type: Faker.random.arrayElement(['Bar', 'Baz']),
                 value: {
                   one: 1,
-                  two: 'TWO'
-                }
-              }
+                  two: 'TWO',
+                },
+              },
             },
             dateField,
             dateOnlyField,
@@ -79,11 +76,11 @@ async function seedDatabase() {
             enumField: 'FOO',
             geometryField: {
               type: 'Point',
-              coordinates: [Faker.random.number(100), Faker.random.number(200)]
+              coordinates: [Faker.random.number(100), Faker.random.number(200)],
             },
             arrayOfInts,
-            arrayOfStrings
-          }
+            arrayOfStrings,
+          },
         },
         `{ id emailField createdAt createdById }`
       );
@@ -99,11 +96,11 @@ async function seedDatabase() {
 }
 
 seedDatabase()
-  .then(result => {
+  .then((result) => {
     logger.info(result);
     return process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     logger.error(err);
     return process.exit(1);
   });

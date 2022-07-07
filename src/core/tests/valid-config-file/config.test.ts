@@ -21,7 +21,7 @@ describe('Config (valid file)', () => {
   test('TypeORM ENV vars beat config file', async () => {
     process.env = {
       NODE_ENV: 'development',
-      WARTHOG_MODELS_PATH: 'env/models/path'
+      WARTHOG_MODELS_PATH: 'env/models/path',
     };
 
     const config = new Config({ configSearchPath: __dirname });
@@ -33,7 +33,7 @@ describe('Config (valid file)', () => {
     process.env = {
       NODE_ENV: 'development',
       WARTHOG_DB_HOST: 'warthog/db/host',
-      TYPEORM_HOST: 'typeorm/host'
+      TYPEORM_HOST: 'typeorm/host',
     };
 
     const config = new Config({ configSearchPath: __dirname });

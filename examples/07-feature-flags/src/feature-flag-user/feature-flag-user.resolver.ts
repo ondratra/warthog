@@ -7,7 +7,7 @@ import {
   FeatureFlagUserUpdateArgs,
   FeatureFlagUserWhereArgs,
   FeatureFlagUserWhereInput,
-  FeatureFlagUserWhereUniqueInput
+  FeatureFlagUserWhereUniqueInput,
 } from '../../generated';
 
 import { User } from '../user/user.model';

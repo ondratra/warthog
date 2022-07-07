@@ -16,13 +16,13 @@ export default {
   alias: ['n'],
   run: async (toolbox: WarthogGluegunToolbox) => {
     const {
-      parameters: { first }
+      parameters: { first },
     } = toolbox;
 
     let name = first;
     if (!name) {
       const { n } = await toolbox.prompt.ask([
-        { type: 'input', name: 'n', message: 'What do you want your project to be called?' }
+        { type: 'input', name: 'n', message: 'What do you want your project to be called?' },
       ]);
       name = String(n);
     }
@@ -40,14 +40,14 @@ export default {
       camelName: toolbox.strings.camelCase(name),
       kebabName: toolbox.strings.kebabCase(name),
       packageJson,
-      warthogVersion
+      warthogVersion,
     };
 
     const newFolder = toolbox.filesystem.path(__dirname, '../templates/new');
     const files = await getFileRecursive(newFolder);
     const generateFolder = process.env.WARTHOG_CLI_GENERATE_PATH || process.cwd();
 
-    files.forEach(async file => {
+    files.forEach(async (file) => {
       const relativePath = path.relative(newFolder, file);
       await generateFile(
         toolbox,
@@ -59,7 +59,7 @@ export default {
     });
 
     return;
-  }
+  },
 };
 
 async function generateFile(
@@ -77,7 +77,7 @@ async function generateFile(
   const generated = await toolbox.template.generate({
     template,
     target,
-    props
+    props,
   });
 
   toolbox.filesystem.write(target, generated);
@@ -88,7 +88,7 @@ async function generateFile(
 async function getFileRecursive(dir: string): Promise<string[]> {
   const subdirs = await readdir(dir);
   const files = await Promise.all(
-    subdirs.map(async subdir => {
+    subdirs.map(async (subdir) => {
       const res = path.resolve(dir, subdir);
       return (await stat(res)).isDirectory() ? getFileRecursive(res) : [res];
     })

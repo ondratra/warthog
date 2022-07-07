@@ -31,7 +31,7 @@ export function spyOnStd() {
     stdout: undefined as any,
     getStdErr: undefined as any,
     getStdOut: undefined as any,
-    getStdOutErr: undefined as any
+    getStdOutErr: undefined as any,
   };
 
   beforeAll(() => {
@@ -104,6 +104,6 @@ function getPGConfig() {
     host: config.get('DB_HOST'),
     user: config.get('DB_USERNAME'),
     password: config.get('DB_PASSWORD'),
-    port: config.get('DB_PORT')
+    port: config.get('DB_PORT'),
   };
 }

@@ -6,12 +6,12 @@ describe('ObjectUtil', () => {
     test('prefixes correctly', async () => {
       const original = {
         One: 1,
-        Two: 2
+        Two: 2,
       };
 
       expect(ObjectUtil.prefixKeys(original, 'prefix')).toEqual({
         prefixOne: 1,
-        prefixTwo: 2
+        prefixTwo: 2,
       });
     });
   });
@@ -20,12 +20,12 @@ describe('ObjectUtil', () => {
     test('constantizes correctly', async () => {
       const original = {
         fourFive: 45,
-        oneTwoThree: 123
+        oneTwoThree: 123,
       };
 
       expect(ObjectUtil.constantizeKeys(original)).toEqual({
         FOUR_FIVE: 45,
-        ONE_TWO_THREE: 123
+        ONE_TWO_THREE: 123,
       });
     });
   });

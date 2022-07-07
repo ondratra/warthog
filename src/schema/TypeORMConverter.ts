@@ -5,7 +5,7 @@ import { WhereOperator } from '../torm';
 import {
   columnToGraphQLDataType,
   columnToGraphQLType,
-  columnToTypeScriptType
+  columnToTypeScriptType,
 } from './type-conversion';
 
 const ignoreBaseModels = ['BaseModel', 'BaseModelUUID'];
@@ -21,7 +21,7 @@ export function getColumnsForModel(model: ModelMetadata) {
     superProto = superProto.__proto__;
   }
 
-  models.forEach(aModel => {
+  models.forEach((aModel) => {
     aModel.columns.forEach((col: ColumnMetadata) => {
       columns[col.propertyName] = col;
     });
@@ -79,7 +79,7 @@ export function entityToWhereUniqueInput(model: ModelMetadata): string {
   const uniques = getMetadataStorage().uniquesForModel(model);
   const others = getMetadataArgsStorage().uniques;
   const modelUniques: { [key: string]: string } = {};
-  others.forEach(o => {
+  others.forEach((o) => {
     const name = (o.target as Function).name;
     const columns = o.columns as string[];
     if (name === model.name && columns) {
@@ -88,7 +88,7 @@ export function entityToWhereUniqueInput(model: ModelMetadata): string {
       });
     }
   });
-  uniques.forEach(unique => {
+  uniques.forEach((unique) => {
     modelUniques[unique] = unique;
   });
   const distinctUniques = Object.keys(modelUniques);
@@ -285,7 +285,7 @@ export function entityToWhereInput(model: ModelMetadata): string {
     const graphQLDataType = columnToGraphQLDataType(column);
     const modelRelationsNames = getMetadataStorage()
       .getModelRelation(model.name)
-      .map(rel => rel.propertyName);
+      .map((rel) => rel.propertyName);
 
     // TODO: for foreign key fields, only allow the same filters as ID below
     // Example: photo.userId: String
@@ -505,7 +505,7 @@ export function entityToWhereInput(model: ModelMetadata): string {
 
   /////// cross filters ///////
   const modelRelations = getMetadataStorage().getModelRelation(model.name);
-  modelRelations.forEach(m => {
+  modelRelations.forEach((m) => {
     if (m.isList) {
       fieldTemplates += `
     @TypeGraphQLField(() => ${m.relModelName}WhereInput, { nullable: true })

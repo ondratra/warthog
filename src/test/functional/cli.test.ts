@@ -36,19 +36,19 @@ describe('cli functional tests', () => {
 
   // This test actually calls the CLI via a system call.  This won't count towards test coverage
   // but it's the most thorough way we can actually check to see if everything is wired up correctly
-  test('spin up an actual process to test the full cli is wired up', async done => {
+  test('spin up an actual process to test the full cli is wired up', async (done) => {
     expect.assertions(2);
 
     // Construct the environment variables here so that they're passed into cli command
 
     const env = {
-      ...process.env
+      ...process.env,
     };
 
     const output = await system.run(
       'node ' + filesystem.path(root, 'bin', 'warthog') + ' --version',
       {
-        env
+        env,
       }
     );
 
@@ -59,14 +59,14 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('outputs help', async done => {
+  test('outputs help', async (done) => {
     await callWarthogCLI('--help');
     const stdout = spy.getStdOutErr();
     expect(stdout).toContain('generate (g)');
     done();
   });
 
-  test('generates models', async done => {
+  test('generates models', async (done) => {
     expect.assertions(23);
 
     await callWarthogCLI(
@@ -118,7 +118,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('generates a shell of a file of no params specified', async done => {
+  test('generates a shell of a file of no params specified', async (done) => {
     expect.assertions(9);
 
     await callWarthogCLI(`generate empty_class --folder ${GENERATED_FOLDER}`);
@@ -141,7 +141,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('generates to a dynamic path', async done => {
+  test('generates to a dynamic path', async (done) => {
     expect.assertions(2);
 
     await callWarthogCLI('generate empty_class --folder ' + GENERATED_FOLDER + '/${camelName}');
@@ -158,7 +158,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('requires name for db:create', async done => {
+  test('requires name for db:create', async (done) => {
     expect.assertions(1);
 
     // process.env.PGUSER = 'postgres';
@@ -169,7 +169,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('successfully creates a database', async done => {
+  test('successfully creates a database', async (done) => {
     pgtools.createdb = jest.fn().mockImplementation((config: any, dbname: string, cb: Function) => {
       cb(null, { success: true });
     });
@@ -182,7 +182,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('throws an error if pg library cant create DB', async done => {
+  test('throws an error if pg library cant create DB', async (done) => {
     pgtools.createdb = jest.fn().mockImplementation((config: any, dbname: string, cb: Function) => {
       cb({ message: 'duplicate database' }, null);
     });
@@ -194,7 +194,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('db:drop: throws an error if database does not exist', async done => {
+  test('db:drop: throws an error if database does not exist', async (done) => {
     pgtools.dropdb = jest.fn().mockImplementation((config: any, dbname: string, cb: Function) => {
       cb({ name: 'invalid_catalog_name' }, null);
     });
@@ -207,7 +207,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('db:drop success', async done => {
+  test('db:drop success', async (done) => {
     pgtools.dropdb = jest.fn().mockImplementation((config: any, dbname: string, cb: Function) => {
       cb(null, { success: true });
     });
@@ -220,7 +220,7 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('db:drop success', async done => {
+  test('db:drop success', async (done) => {
     await callWarthogCLI('db:migrate:generate');
     const stdout = spy.getStdOutErr();
     expect(stdout).toContain('"name" option is required');
@@ -229,13 +229,13 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('generates and runs migrations', async done => {
+  test('generates and runs migrations', async (done) => {
     const migrationDBName = 'warthog-test-generate-migrations';
 
     // Set environment variables for a test server that writes to a separate test DB and does NOT autogenerate files
     setTestServerEnvironmentVariables({
       WARTHOG_DB_DATABASE: migrationDBName,
-      WARTHOG_DB_SYNCHRONIZE: 'false'
+      WARTHOG_DB_SYNCHRONIZE: 'false',
     });
 
     await allowError(
@@ -260,20 +260,20 @@ describe('cli functional tests', () => {
     done();
   });
 
-  test('warthog (with no command)', async done => {
+  test('warthog (with no command)', async (done) => {
     await callWarthogCLI('');
     const stdout = spy.getStdOutErr();
     expect(stdout).toContain('Warthog: GraphQL API Framework');
     done();
   });
 
-  test('warthog playground', async done => {
+  test('warthog playground', async (done) => {
     await callWarthogCLI('playground');
     expect(openMock).toBeCalledWith('http://localhost:4000/playground', { wait: false });
     done();
   });
 
-  test('codegen creates correct files', async done => {
+  test('codegen creates correct files', async (done) => {
     const folder = './tmp/codegen';
     filesystem.remove(folder);
     process.env.WARTHOG_GENERATED_FOLDER = folder;

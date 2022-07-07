@@ -6,14 +6,14 @@ import {
   FloatField,
   IntField,
   Model,
-  StringField
+  StringField,
 } from '../../../src';
 
 // Note: this must be exported and in the same file where it's attached with @EnumField
 // Also - must use string enums
 export enum StringEnum {
   FOO = 'FOO',
-  BAR = 'BAR'
+  BAR = 'BAR',
 }
 
 @Model()

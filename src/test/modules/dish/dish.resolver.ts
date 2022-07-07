@@ -11,7 +11,7 @@ import {
   Resolver,
   Root,
   ObjectType,
-  Field
+  Field,
 } from 'type-graphql';
 import { Inject } from 'typedi';
 import { Min } from 'class-validator';
@@ -22,7 +22,7 @@ import {
   RawFields,
   PageInfo,
   // StandardDeleteResponse,
-  UserId
+  UserId,
 } from '../../../';
 
 import {
@@ -32,7 +32,7 @@ import {
   // DishUpdateArgs,
   DishWhereArgs,
   DishWhereInput,
-  DishWhereUniqueInput
+  DishWhereUniqueInput,
 } from '../../generated';
 
 import { KitchenSink } from '../kitchen-sink/kitchen-sink.model';
@@ -132,9 +132,9 @@ export class DishResolver {
     // TODO: understand why this is actually needed and how to fix it
     //       see `createManyDishes` in `server.test.ts` for second part of these changes
     //       it doesn't affect Joystream so I'm keeping this workaround here to make all tests pass
-    const tmp = data.map(item => ({
+    const tmp = data.map((item) => ({
       name: item.name,
-      kitchenSink: { id: item.kitchenSink }
+      kitchenSink: { id: item.kitchenSink },
     }));
 
     return this.service.createMany(tmp, userId);

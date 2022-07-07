@@ -9,7 +9,7 @@ export default {
   name: 'codegen',
   run: async (toolbox: WarthogGluegunToolbox) => {
     const {
-      config: { load }
+      config: { load },
     } = toolbox;
 
     const config = load();
@@ -18,7 +18,7 @@ export default {
       await new CodeGenerator(config.get('GENERATED_FOLDER'), config.get('DB_ENTITIES'), {
         resolversPath: config.get('RESOLVERS_PATH'),
         validateResolvers: config.get('VALIDATE_RESOLVERS') === 'true',
-        warthogImportPath: config.get('MODULE_IMPORT_PATH')
+        warthogImportPath: config.get('MODULE_IMPORT_PATH'),
       }).generate();
     } catch (error) {
       logger.error(error);
@@ -26,5 +26,5 @@ export default {
         logger.error('This often means you have multiple versions of TypeGraphQL installed.');
       }
     }
-  }
+  },
 };

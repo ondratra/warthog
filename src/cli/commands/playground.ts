@@ -12,5 +12,5 @@ export default {
     const url = `http://${host}:${port}/playground`;
 
     return open(url, { wait: false });
-  }
+  },
 };

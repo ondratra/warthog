@@ -4,7 +4,7 @@ export function setTestServerEnvironmentVariables(overrides?: StringMap) {
   clearConfig();
 
   const defaultVars = getStandardEnvironmentVariables();
-  Object.keys(defaultVars).forEach(key => {
+  Object.keys(defaultVars).forEach((key) => {
     process.env[key] = defaultVars[key];
   });
 
@@ -12,7 +12,7 @@ export function setTestServerEnvironmentVariables(overrides?: StringMap) {
     return;
   }
 
-  Object.keys(overrides).forEach(key => {
+  Object.keys(overrides).forEach((key) => {
     process.env[key] = overrides[key];
   });
 }
@@ -36,14 +36,14 @@ export function getStandardEnvironmentVariables(): StringMap {
     WARTHOG_GENERATED_FOLDER: './src/test/generated',
     WARTHOG_RESOLVERS_PATH: './src/test/modules/**/*.resolver.ts',
     WARTHOG_MODULE_IMPORT_PATH: '../../',
-    WARTHOG_VALIDATE_RESOLVERS: 'false'
+    WARTHOG_VALIDATE_RESOLVERS: 'false',
   };
 }
 
 export function clearConfig() {
   const WARTHOG_PREFIX = 'WARTHOG_';
   const TYPEORM_PREFIX = 'TYPEORM_';
-  Object.keys(process.env).forEach(key => {
+  Object.keys(process.env).forEach((key) => {
     if (key.startsWith(WARTHOG_PREFIX) || key.startsWith(TYPEORM_PREFIX)) {
       delete process.env[key];
     }

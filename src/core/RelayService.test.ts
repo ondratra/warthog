@@ -49,14 +49,14 @@ describe('RelayService', () => {
     test('works with an array input including ID', () => {
       expect(relay.toSortArray(['createdAt_ASC', 'id_DESC'])).toEqual([
         sortCreatedAtASC,
-        sortIdDESC
+        sortIdDESC,
       ]);
     });
 
     test('works with an array input not including ID', () => {
       expect(relay.toSortArray(['createdAt_ASC', 'foo_DESC'])).toEqual([
         sortCreatedAtASC,
-        sortFooDESC
+        sortFooDESC,
       ]);
     });
   });
@@ -103,7 +103,7 @@ describe('RelayService', () => {
       expect(obj).toStrictEqual([
         ['createdAt', 'DESC', '1981-10-15T00:00:00.000Z'],
         ['name', 'ASC', 'Foo'],
-        ['id', 'ASC', '1']
+        ['id', 'ASC', '1'],
       ]);
     });
   });
@@ -158,7 +158,7 @@ describe('RelayService', () => {
 
     test('Works properly if youre on the last page', () => {
       const result = relay.getPageInfo([foo, foo, foo, foo, bar, foo], sortCreatedAtASC, {
-        first: 5
+        first: 5,
       });
       const startDecoded = e.decode(result.startCursor);
       const endDecoded = e.decode(result.endCursor);
@@ -198,7 +198,7 @@ describe('RelayService', () => {
     test('works for base ID case', () => {
       const cursor = relay.encodeCursor(foo, 'id_ASC');
       expect(relay.getFilters(undefined, { first: 1, after: cursor })).toEqual({
-        OR: [{ id_gt: '1' }]
+        OR: [{ id_gt: '1' }],
       });
     });
 
@@ -206,7 +206,7 @@ describe('RelayService', () => {
       const sorts = 'name_DESC';
       const cursor = relay.encodeCursor(foo, sorts);
       expect(relay.getFilters(sorts, { first: 1, after: cursor })).toEqual({
-        OR: [{ name_lt: 'Foo' }, { id_gt: '1', name_eq: 'Foo' }]
+        OR: [{ name_lt: 'Foo' }, { id_gt: '1', name_eq: 'Foo' }],
       });
     });
 
@@ -217,8 +217,8 @@ describe('RelayService', () => {
         OR: [
           { createdAt_gt: '1981-10-15T00:00:00.000Z' },
           { createdAt_eq: '1981-10-15T00:00:00.000Z', name_lt: 'Foo' },
-          { createdAt_eq: '1981-10-15T00:00:00.000Z', name_eq: 'Foo', id_gt: '1' }
-        ]
+          { createdAt_eq: '1981-10-15T00:00:00.000Z', name_eq: 'Foo', id_gt: '1' },
+        ],
       });
     });
   });

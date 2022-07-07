@@ -7,7 +7,7 @@ import {
   UserSegmentUpdateArgs,
   UserSegmentWhereArgs,
   UserSegmentWhereInput,
-  UserSegmentWhereUniqueInput
+  UserSegmentWhereUniqueInput,
 } from '../../generated';
 
 import { UserSegment } from './user-segment.model';

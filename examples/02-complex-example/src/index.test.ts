@@ -10,11 +10,11 @@ const server = getServer({}, { logging: false });
 let binding: Binding;
 let testUser: User;
 
-beforeAll(async done => {
+beforeAll(async (done) => {
   console.error = jest.fn();
 
   await server.start();
-  binding = ((await server.getBinding()) as unknown) as Binding; // TODO: clean this up
+  binding = (await server.getBinding()) as unknown as Binding; // TODO: clean this up
 
   const key = new Date().getTime();
 
@@ -24,8 +24,8 @@ beforeAll(async done => {
         email: `goldcaddy${key}@gmail.com`,
         firstName: `first ${key}`,
         lastName: `last ${key}`,
-        stringEnumField: StringEnum.FOO
-      }
+        stringEnumField: StringEnum.FOO,
+      },
     },
     `{ id email firstName lastName }`
   );
@@ -33,14 +33,14 @@ beforeAll(async done => {
   done();
 });
 
-afterAll(async done => {
+afterAll(async (done) => {
   (console.error as any).mockRestore();
   await server.stop();
   done();
 });
 
 describe('Users', () => {
-  test('find user by id', async done => {
+  test('find user by id', async (done) => {
     const user = await binding.query.user({ where: { id: String(testUser.id) } }, `{ id }`);
 
     // If user tries to access a private field, it will throw a console error.
@@ -52,7 +52,7 @@ describe('Users', () => {
     done();
   });
 
-  test('createdAt sort', async done => {
+  test('createdAt sort', async (done) => {
     const users = await binding.query.users(
       { limit: 1, orderBy: 'createdAt_DESC' },
       `{ id firstName}`
@@ -65,7 +65,7 @@ describe('Users', () => {
     done();
   });
 
-  test('uniqueness failure', async done => {
+  test('uniqueness failure', async (done) => {
     let error: GraphQLError = new GraphQLError('');
     try {
       await binding.mutation.createUser(
@@ -74,8 +74,8 @@ describe('Users', () => {
             email: testUser.email,
             firstName: testUser.firstName,
             lastName: testUser.lastName,
-            stringEnumField: StringEnum.FOO
-          }
+            stringEnumField: StringEnum.FOO,
+          },
         },
         `{ id email createdAt createdById }`
       );

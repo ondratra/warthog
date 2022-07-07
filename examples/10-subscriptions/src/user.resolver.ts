@@ -12,7 +12,7 @@ import {
   Query,
   Resolver,
   Root,
-  Subscription
+  Subscription,
 } from 'type-graphql';
 import { Inject } from 'typedi';
 
@@ -22,7 +22,7 @@ import {
   UserUpdateArgs,
   UserWhereArgs,
   UserWhereInput,
-  UserWhereUniqueInput
+  UserWhereUniqueInput,
 } from '../generated';
 
 import { User } from './user.model';

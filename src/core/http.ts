@@ -18,7 +18,7 @@ export async function get(url: string): Promise<GetResponse> {
       response.on('end', () => {
         return resolve({
           statusCode: response.statusCode,
-          body: body.join('')
+          body: body.join(''),
         });
       });
     });

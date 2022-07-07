@@ -9,5 +9,5 @@ export const GraphQLBigNumber = new GraphQLScalarType({
   },
   serialize(value: BN) {
     return value ? value.toString() : value; // value sent to the client
-  }
+  },
 });

@@ -30,7 +30,7 @@ export class Book extends BaseModel {
       nullable: true,
       modelName: 'Book',
       relModelName: 'Author',
-      propertyName: 'author'
+      propertyName: 'author',
     }
   )
   author!: Author;
@@ -41,13 +41,13 @@ export class Book extends BaseModel {
     {
       modelName: 'Book',
       relModelName: 'Library',
-      propertyName: 'libraries'
+      propertyName: 'libraries',
     }
   )
   @JoinTable({
     name: 'book_in_library',
     joinColumn: { name: 'book_id' },
-    inverseJoinColumn: { name: 'library_id' }
+    inverseJoinColumn: { name: 'library_id' },
   })
   libraries!: Library[];
 
@@ -58,7 +58,7 @@ export class Book extends BaseModel {
       nullable: true,
       modelName: 'Book',
       relModelName: 'BookMetadata',
-      propertyName: 'bookMetadata'
+      propertyName: 'bookMetadata',
     }
   )
   bookMetadata!: BookMetadata;
@@ -69,16 +69,12 @@ export class Author extends BaseModel {
   @Column()
   name!: string;
 
-  @OneToMany(
-    () => Book,
-    (param: Book) => param.author,
-    {
-      cascade: ['insert', 'update'],
-      modelName: 'Author',
-      relModelName: 'Book',
-      propertyName: 'books'
-    }
-  )
+  @OneToMany(() => Book, (param: Book) => param.author, {
+    cascade: ['insert', 'update'],
+    modelName: 'Author',
+    relModelName: 'Book',
+    propertyName: 'books',
+  })
   books!: Book[];
 }
 
@@ -87,15 +83,11 @@ export class Library extends BaseModel {
   @Column()
   name!: string;
 
-  @ManyToMany(
-    () => Book,
-    (param: Book) => param.libraries,
-    {
-      modelName: 'Library',
-      relModelName: 'Book',
-      propertyName: 'books'
-    }
-  )
+  @ManyToMany(() => Book, (param: Book) => param.libraries, {
+    modelName: 'Library',
+    relModelName: 'Book',
+    propertyName: 'books',
+  })
   books!: Book[];
 }
 
@@ -104,15 +96,11 @@ export class BookMetadata extends BaseModel {
   @Column()
   ISBN!: string;
 
-  @OneToOne(
-    () => Book,
-    (param: Book) => param.bookMetadata,
-    {
-      modelName: 'Video',
-      relModelName: 'Book',
-      propertyName: 'book'
-    }
-  )
+  @OneToOne(() => Book, (param: Book) => param.bookMetadata, {
+    modelName: 'Video',
+    relModelName: 'Book',
+    propertyName: 'book',
+  })
   book!: Book;
 }
 

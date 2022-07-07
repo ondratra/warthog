@@ -4,7 +4,7 @@ describe('Dotenv files', () => {
   test('Pulls config in correct order', async () => {
     process.env = {
       NODE_ENV: 'development',
-      WARTHOG_PROPER_ENV_VARIABLE: '12345'
+      WARTHOG_PROPER_ENV_VARIABLE: '12345',
     };
 
     new Config({ dotenvPath: __dirname });

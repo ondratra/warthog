@@ -25,7 +25,7 @@ export function BytesField(options: BytesFieldOptions = {}): any {
     warthogColumnMeta: options,
     gqlFieldType: Bytes,
     dbType: 'bytea',
-    dbColumnOptions: { ...nullableOption, ...dbOptions }
+    dbColumnOptions: { ...nullableOption, ...dbOptions },
   });
 
   return composeMethodDecorators(...factories);

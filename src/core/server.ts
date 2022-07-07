@@ -163,7 +163,7 @@ export class Server<C extends BaseContext> {
     try {
       binding = await getRemoteBinding(this.getGraphQLServerUrl(), {
         origin: 'warthog',
-        ...options
+        ...options,
       });
       return binding;
     } catch (error) {
@@ -183,13 +183,13 @@ export class Server<C extends BaseContext> {
         scalarsMap: [
           {
             type: 'ID' as any,
-            scalar: GraphQLID
+            scalar: GraphQLID,
           },
           // Note: DateTime already included in type-graphql
           {
             type: 'DateOnlyString' as any,
-            scalar: DateResolver
-          }
+            scalar: DateResolver,
+          },
         ],
         container: this.container as any,
         // TODO: ErrorLoggerMiddleware
@@ -197,7 +197,7 @@ export class Server<C extends BaseContext> {
         resolvers: this.config.get('RESOLVERS_PATH'),
         // TODO: scalarsMap: [{ type: GraphQLDate, scalar: GraphQLDate }]
         validate: this.config.get('VALIDATE_RESOLVERS') === 'true',
-        pubSub: this.appOptions.pubSub
+        pubSub: this.appOptions.pubSub,
       });
       debug('server:buildGraphQLSchema:end');
     }
@@ -210,7 +210,7 @@ export class Server<C extends BaseContext> {
     await new CodeGenerator(this.config.get('GENERATED_FOLDER'), this.config.get('DB_ENTITIES'), {
       resolversPath: this.config.get('RESOLVERS_PATH'),
       validateResolvers: this.config.get('VALIDATE_RESOLVERS') === 'true',
-      warthogImportPath: this.config.get('MODULE_IMPORT_PATH')
+      warthogImportPath: this.config.get('MODULE_IMPORT_PATH'),
     }).generate();
 
     debug('start:generateFiles:end');
@@ -260,8 +260,8 @@ export class Server<C extends BaseContext> {
               endpoint: this.appOptions.playgroundConfig?.endpoint,
 
               // pass custom query templates to playground
-              queryTemplates: this.appOptions.playgroundConfig?.queryTemplates || []
-            }
+              queryTemplates: this.appOptions.playgroundConfig?.queryTemplates || [],
+            },
           }
         : {};
     const introspectionOption =
@@ -275,17 +275,17 @@ export class Server<C extends BaseContext> {
           connection: this.connection,
           dataLoader: {
             initialized: false,
-            loaders: {}
+            loaders: {},
           },
           request: options.req,
           // Allows consumer to add to the context object - ex. context.user
-          ...consumerCtx
+          ...consumerCtx,
         };
       },
       ...playgroundOption,
       ...introspectionOption,
       schema: this.schema,
-      ...this.apolloConfig
+      ...this.apolloConfig,
     });
 
     debug('start:ApolloServerAllocation:end');
@@ -306,7 +306,7 @@ export class Server<C extends BaseContext> {
     this.graphQLServer.applyMiddleware({
       app: this.expressApp,
       bodyParserConfig: this.bodyParserConfig,
-      path: this.config.get('APP_PATH') || '/graphql'
+      path: this.config.get('APP_PATH') || '/graphql',
     });
     debug('start:applyMiddleware:end');
 

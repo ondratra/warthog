@@ -44,6 +44,6 @@ export class FeatureFlagService extends BaseService<FeatureFlag> {
 
     const results = await this.repository.query(query, [data.userKey, data.projKey, data.envKey]);
 
-    return results.map(item => item.feature_key);
+    return results.map((item) => item.feature_key);
   }
 }

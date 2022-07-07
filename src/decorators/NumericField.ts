@@ -25,7 +25,7 @@ export function NumericField(options: NumericFieldOptions = {}): any {
     warthogColumnMeta: options,
     gqlFieldType: GraphQLBigNumber,
     dbType: options.dataType ?? 'numeric',
-    dbColumnOptions: { ...nullableOption, ...dbOptions }
+    dbColumnOptions: { ...nullableOption, ...dbOptions },
   });
 
   return composeMethodDecorators(...factories);

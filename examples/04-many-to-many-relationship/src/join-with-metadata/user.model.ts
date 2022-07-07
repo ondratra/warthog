@@ -7,9 +7,6 @@ export class User extends BaseModel {
   @StringField()
   firstName?: string;
 
-  @OneToMany(
-    () => UserRole,
-    (userRole: UserRole) => userRole.user
-  )
+  @OneToMany(() => UserRole, (userRole: UserRole) => userRole.user)
   userRoles?: UserRole[];
 }

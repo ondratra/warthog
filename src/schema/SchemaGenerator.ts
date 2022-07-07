@@ -12,7 +12,7 @@ import {
   entityToUpdateInputArgs,
   entityToWhereArgs,
   entityToWhereInput,
-  entityToWhereUniqueInput
+  entityToWhereUniqueInput,
 } from './TypeORMConverter';
 import { getMetadataStorage, ModelMetadata } from '../metadata';
 
@@ -84,7 +84,7 @@ export class SchemaGenerator {
       // TODO: grab our prettier options (single quote, etc...)
       return prettier.format(code, {
         ...options,
-        parser: 'typescript'
+        parser: 'typescript',
       });
     } catch (e) {
       this.logger.error(

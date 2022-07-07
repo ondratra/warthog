@@ -9,7 +9,7 @@ export function getBaseConfig() {
     cli: {
       entitiesDir: process.env.WARTHOG_DB_ENTITIES_DIR,
       migrationsDir: process.env.WARTHOG_DB_MIGRATIONS_DIR,
-      subscribersDir: process.env.WARTHOG_DB_SUBSCRIBERS_DIR
+      subscribersDir: process.env.WARTHOG_DB_SUBSCRIBERS_DIR,
     },
     database: process.env.WARTHOG_DB_DATABASE!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
     entities: getDatabaseEntityPaths(),
@@ -23,7 +23,7 @@ export function getBaseConfig() {
     subscribers: getDatabaseSubscriberPaths(),
     synchronize: process.env.WARTHOG_DB_SYNCHRONIZE === 'true',
     type: process.env.WARTHOG_DB_CONNECTION!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    username: process.env.WARTHOG_DB_USERNAME
+    username: process.env.WARTHOG_DB_USERNAME,
   };
 }
 
@@ -32,7 +32,7 @@ export function getBaseConfig() {
 export const createDBConnection = async (dbOptions: Partial<ConnectionOptions> = {}) => {
   const config = {
     ...getBaseConfig(),
-    ...dbOptions
+    ...dbOptions,
   };
 
   if (!config.database) {

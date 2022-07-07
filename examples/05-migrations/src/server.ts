@@ -8,12 +8,12 @@ export function getServer(AppOptions = {}) {
       context: () => {
         return {
           user: {
-            id: 'abc123'
-          }
+            id: 'abc123',
+          },
         };
       },
       introspection: true,
-      ...AppOptions
+      ...AppOptions,
     },
     // Make sure TypeORM does not auto-update the DB schema so that we know our CLI commands
     // are making the changes

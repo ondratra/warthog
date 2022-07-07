@@ -7,7 +7,7 @@ import { composeMethodDecorators, MethodDecoratorFactory } from '../utils';
 export function OneToOne(parentType: any, joinFunc: any, options: any = {}): any {
   const factories = [
     Field(parentType, { ...options }) as MethodDecoratorFactory,
-    TypeORMOneToOne(parentType, joinFunc, options) as MethodDecoratorFactory
+    TypeORMOneToOne(parentType, joinFunc, options) as MethodDecoratorFactory,
   ];
   getMetadataStorage().addModelRelation({ ...options, isList: false });
 

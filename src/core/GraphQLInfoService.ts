@@ -34,7 +34,7 @@ export class GraphQLInfoService {
         totalCount: false,
         endCursor: false,
         startCursor: '',
-        edgeCursors: ''
+        edgeCursors: '',
       };
     }
 
@@ -43,7 +43,7 @@ export class GraphQLInfoService {
       totalCount: isDefined(fields.totalCount),
       endCursor: isDefined(fields.pageInfo?.endCursor),
       startCursor: isDefined(fields.pageInfo?.startCursor),
-      edgeCursors: isDefined(fields?.edges?.cursor)
+      edgeCursors: isDefined(fields?.edges?.cursor),
     };
   }
 
@@ -52,7 +52,7 @@ export class GraphQLInfoService {
       return [];
     }
 
-    const scalars = Object.keys(node).filter(item => {
+    const scalars = Object.keys(node).filter((item) => {
       return Object.keys(node[item]).length === 0;
     });
 

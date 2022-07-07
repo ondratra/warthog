@@ -39,7 +39,7 @@ export function Model({ api = {}, db = {}, apiOnly = false, dbOnly = false }: Mo
     // Save off where the model is located so that we can import it in the generated classes
     getMetadataStorage().addModel(target.name, target, relativeFilePath, {
       ...apiOnlyOption,
-      ...dbOnlyOption
+      ...dbOnlyOption,
     });
   };
 

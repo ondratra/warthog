@@ -14,12 +14,12 @@ export class DataLoaderMiddleware implements MiddlewareInterface<BaseContext> {
     if (!context.dataLoader.initialized) {
       context.dataLoader = {
         initialized: true,
-        loaders: {}
+        loaders: {},
       };
 
       const loaders = context.dataLoader.loaders;
 
-      context.connection.entityMetadatas.forEach(entityMetadata => {
+      context.connection.entityMetadatas.forEach((entityMetadata) => {
         const resolverName = entityMetadata.targetName;
         if (!resolverName) {
           return;
@@ -29,7 +29,7 @@ export class DataLoaderMiddleware implements MiddlewareInterface<BaseContext> {
           loaders[resolverName] = {};
         }
 
-        entityMetadata.relations.forEach(relation => {
+        entityMetadata.relations.forEach((relation) => {
           // define data loader for this method if it was not defined yet
           if (!loaders[resolverName][relation.propertyName]) {
             loaders[resolverName][relation.propertyName] = new DataLoader((entities: any[]) => {
@@ -37,9 +37,9 @@ export class DataLoaderMiddleware implements MiddlewareInterface<BaseContext> {
                 throw new Error('You must flatten arrays of arrays of entities');
               }
               return Promise.all(
-                entities.map(entity => context.connection.relationLoader.load(relation, entity))
-              ).then(function(results) {
-                return results.map(function(related) {
+                entities.map((entity) => context.connection.relationLoader.load(relation, entity))
+              ).then(function (results) {
+                return results.map(function (related) {
                   return relation.isManyToOne || relation.isOneToOne ? related[0] : related;
                 });
               });

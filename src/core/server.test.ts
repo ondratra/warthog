@@ -15,7 +15,7 @@ describe('Server', () => {
   });
 
   // Make sure to clean up server after each test
-  afterEach(async done => {
+  afterEach(async (done) => {
     await server.stop();
     appListenSpy.mockRestore();
     done();
@@ -50,7 +50,7 @@ function buildServer(options: ServerOptions<any>): Server<any> {
   setTestServerEnvironmentVariables();
   return getTestServer({
     apolloConfig: { playground: false },
-    ...options
+    ...options,
   });
 }
 

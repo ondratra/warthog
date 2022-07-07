@@ -17,11 +17,11 @@ export function getServer(AppOptions = {}, dbOptions = {}) {
       context: () => {
         return {
           user: {
-            id: 'abc123'
-          }
+            id: 'abc123',
+          },
         };
       },
-      ...AppOptions
+      ...AppOptions,
     },
     dbOptions
   );

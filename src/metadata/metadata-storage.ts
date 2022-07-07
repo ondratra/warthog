@@ -90,7 +90,7 @@ export class MetadataStorage {
       readonly: false,
       sort: config.get('FILTER_BY_DEFAULT') !== 'false',
       unique: false,
-      writeonly: false
+      writeonly: false,
     };
 
     this.baseColumns = [
@@ -101,7 +101,7 @@ export class MetadataStorage {
         nullable: false,
         sort: false,
         unique: true,
-        editable: false
+        editable: false,
       },
       {
         propertyName: 'createdAt',
@@ -110,7 +110,7 @@ export class MetadataStorage {
         filter: true,
         nullable: false,
         sort: true,
-        unique: false
+        unique: false,
       },
       {
         propertyName: 'createdById',
@@ -119,7 +119,7 @@ export class MetadataStorage {
         filter: true,
         nullable: false,
         sort: false,
-        unique: false
+        unique: false,
       },
       {
         propertyName: 'updatedAt',
@@ -128,7 +128,7 @@ export class MetadataStorage {
         filter: true,
         nullable: true,
         sort: true,
-        unique: false
+        unique: false,
       },
       {
         propertyName: 'updatedById',
@@ -137,7 +137,7 @@ export class MetadataStorage {
         filter: true,
         nullable: true,
         sort: false,
-        unique: false
+        unique: false,
       },
       {
         propertyName: 'deletedAt',
@@ -146,7 +146,7 @@ export class MetadataStorage {
         filter: true,
         nullable: true,
         sort: true,
-        unique: false
+        unique: false,
       },
       {
         propertyName: 'deletedById',
@@ -155,7 +155,7 @@ export class MetadataStorage {
         filter: true,
         nullable: true,
         sort: false,
-        unique: false
+        unique: false,
       },
       {
         type: 'integer',
@@ -164,8 +164,8 @@ export class MetadataStorage {
         filter: false,
         nullable: false,
         sort: false,
-        unique: false
-      }
+        unique: false,
+      },
     ];
   }
 
@@ -176,7 +176,7 @@ export class MetadataStorage {
     this.classMap[name] = {
       filename,
       klass,
-      name
+      name,
     };
   }
 
@@ -188,7 +188,7 @@ export class MetadataStorage {
     this.classMap[name] = {
       filename,
       klass,
-      name
+      name,
     };
 
     // Just add `klass` and `filename` to the model object
@@ -196,7 +196,7 @@ export class MetadataStorage {
       ...this.models[name],
       klass,
       filename,
-      ...options
+      ...options,
     };
   }
 
@@ -212,7 +212,7 @@ export class MetadataStorage {
     this.enumMap[modelName][columnName] = {
       enumeration: enumValues,
       filename,
-      name: enumName
+      name: enumName,
     };
 
     // the enum needs to be passed so that it can be bound to column metadata
@@ -236,14 +236,14 @@ export class MetadataStorage {
       this.models[modelName] = {
         name: modelName,
         columns: Array.from(this.baseColumns),
-        relations: []
+        relations: [],
       };
     }
 
     this.models[modelName].relations.push({
       relModelName,
       propertyName,
-      isList
+      isList,
     });
   }
 
@@ -276,7 +276,7 @@ export class MetadataStorage {
       this.models[modelName] = {
         name: modelName,
         columns: Array.from(this.baseColumns),
-        relations: []
+        relations: [],
       };
     }
 
@@ -284,12 +284,12 @@ export class MetadataStorage {
       type,
       propertyName: columnName,
       ...this.decoratorDefaults,
-      ...options
+      ...options,
     });
   }
 
   uniquesForModel(model: ModelMetadata): string[] {
-    return model.columns.filter(column => column.unique).map(column => column.propertyName);
+    return model.columns.filter((column) => column.unique).map((column) => column.propertyName);
   }
 
   addInterfaceType(name: string) {

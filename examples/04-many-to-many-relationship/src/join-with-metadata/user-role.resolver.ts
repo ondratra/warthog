@@ -7,7 +7,7 @@ import {
   UserRoleCreateInput,
   UserRoleCreateManyArgs,
   UserRoleWhereArgs,
-  UserRoleWhereInput
+  UserRoleWhereInput,
 } from '../../generated';
 import { Role } from './role.model';
 import { UserRole } from './user-role.model';

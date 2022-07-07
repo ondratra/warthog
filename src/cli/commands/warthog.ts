@@ -6,5 +6,5 @@ export default {
     const { print } = toolbox;
 
     print.info('Warthog: GraphQL API Framework');
-  }
+  },
 };

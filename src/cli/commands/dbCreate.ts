@@ -5,11 +5,11 @@ export default {
   run: async (toolbox: WarthogGluegunToolbox) => {
     const {
       db,
-      config: { load }
+      config: { load },
     } = toolbox;
 
     const config = load();
 
     await db.create(config.get('DB_DATABASE'));
-  }
+  },
 };

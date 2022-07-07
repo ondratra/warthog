@@ -6,6 +6,6 @@ module.exports = (toolbox: WarthogGluegunToolbox) => {
   toolbox.config = {
     load: function create() {
       return new Config();
-    }
+    },
   };
 };

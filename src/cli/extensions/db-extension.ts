@@ -13,7 +13,7 @@ const exec = util.promisify(childProcess.exec);
 module.exports = (toolbox: GluegunToolbox) => {
   const {
     config: { load },
-    print: { error, info }
+    print: { error, info },
   } = toolbox;
 
   toolbox.db = {
@@ -99,7 +99,7 @@ module.exports = (toolbox: GluegunToolbox) => {
       } else {
         return info(result.stdout);
       }
-    }
+    },
   };
 };
 
@@ -135,7 +135,7 @@ async function runTypeORMCommand(command: string, toolbox: Toolbox, additionalPa
 function filteredProcessEnv() {
   const raw = process.env;
   return Object.keys(raw)
-    .filter(key => !key.startsWith('TYPEORM_'))
+    .filter((key) => !key.startsWith('TYPEORM_'))
     .reduce((obj: any, key) => {
       obj[key] = raw[key];
       return obj;
@@ -147,7 +147,7 @@ function getPgConfig(config: any) {
     host: config.get('DB_HOST'),
     user: config.get('DB_USERNAME'),
     password: config.get('DB_PASSWORD'),
-    port: config.get('DB_PORT')
+    port: config.get('DB_PORT'),
   };
 }
 

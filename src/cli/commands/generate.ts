@@ -13,7 +13,7 @@ export default {
       config: { load },
       parameters: { options, first, array },
       print: { error },
-      string: { supplant }
+      string: { supplant },
     } = toolbox;
 
     const config: any = load();
@@ -28,7 +28,7 @@ export default {
       camelName: toolbox.strings.camelCase(name),
       kebabName: toolbox.strings.kebabCase(name),
       // Not proper pluralization, but good enough and easy to fix in generated code
-      camelNamePlural: toolbox.strings.camelCase(name) + 's'
+      camelNamePlural: toolbox.strings.camelCase(name) + 's',
     };
 
     // Allow folder to be passed in or pulled from config files
@@ -70,7 +70,7 @@ export default {
       fields: array ? processFields(array.slice(1)) : [],
       generatedFolderRelativePath,
       warthogPathInSourceFiles,
-      getRelativePathForModel
+      getRelativePathForModel,
     };
 
     await generateFile(
@@ -98,7 +98,7 @@ export default {
     );
 
     return;
-  }
+  },
 };
 
 async function generateFile(
@@ -115,12 +115,12 @@ async function generateFile(
   let generated = await toolbox.template.generate({
     template,
     target,
-    props
+    props,
   });
 
   generated = prettier.format(generated, {
     ...(config ? config.config : {}),
-    parser: 'typescript'
+    parser: 'typescript',
   });
 
   toolbox.filesystem.write(target, generated);
@@ -160,52 +160,52 @@ function processFields(fields: string[]) {
     const typeFields: { [key: string]: { [key: string]: string } } = {
       bool: {
         decorator: 'BooleanField',
-        tsType: 'boolean'
+        tsType: 'boolean',
       },
       date: {
         decorator: 'DateField',
-        tsType: 'Date'
+        tsType: 'Date',
       },
       int: {
         decorator: 'IntField',
-        tsType: 'number'
+        tsType: 'number',
       },
       float: {
         decorator: 'FloatField',
-        tsType: 'number'
+        tsType: 'number',
       },
       json: {
         decorator: 'JSONField',
-        tsType: 'JsonObject'
+        tsType: 'JsonObject',
       },
       otm: {
         decorator: 'OneToMany',
-        tsType: '---'
+        tsType: '---',
       },
       string: {
         decorator: 'StringField',
-        tsType: 'string'
+        tsType: 'string',
       },
       numeric: {
         decorator: 'NumericField',
-        tsType: 'string'
+        tsType: 'string',
       },
       decimal: {
         decorator: 'NumericField',
-        tsType: 'string'
+        tsType: 'string',
       },
       oto: {
         decorator: 'OneToOne',
-        tsType: '---'
+        tsType: '---',
       },
       array: {
         decorator: 'ArrayField',
-        tsType: '' // will be updated with the correct type
+        tsType: '', // will be updated with the correct type
       },
       bytes: {
         decorator: 'BytesField',
-        tsType: 'Buffer'
-      }
+        tsType: 'Buffer',
+      },
     };
 
     if (parts[1] && parts[1].startsWith('array')) {
@@ -223,7 +223,7 @@ function processFields(fields: string[]) {
 
     field = {
       ...field,
-      ...typeFields[field.type]
+      ...typeFields[field.type],
     };
 
     return field;
@@ -238,7 +238,7 @@ function getTypesForArray(typeName: string) {
     float: 'float',
     date: 'date',
     numeric: 'numeric',
-    decimal: 'numeric'
+    decimal: 'numeric',
   };
   const apiType = graphQLFieldTypes[typeName];
 

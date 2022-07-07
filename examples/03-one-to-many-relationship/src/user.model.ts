@@ -7,9 +7,6 @@ export class User extends BaseModel {
   @StringField()
   firstName?: string;
 
-  @OneToMany(
-    () => Post,
-    (post: Post) => post.user
-  )
+  @OneToMany(() => Post, (post: Post) => post.user)
   posts?: Post[];
 }
