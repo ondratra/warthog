@@ -37,7 +37,7 @@ export function EnumField(name: string, enumeration: object, options: EnumFieldO
   const factories = [
     registerWithWarthog,
     Field(() => enumeration, options),
-    Column({ enum: enumeration, ...options }) as MethodDecoratorFactory
+    Column({ enum: enumeration, ...options }) as MethodDecoratorFactory,
   ];
 
   return composeMethodDecorators(...factories);

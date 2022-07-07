@@ -5,5 +5,5 @@ export default {
   run: async (toolbox: WarthogGluegunToolbox) => {
     const { db } = toolbox;
     await db.drop();
-  }
+  },
 };

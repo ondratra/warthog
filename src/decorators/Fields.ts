@@ -12,7 +12,7 @@ export function Fields(): ParameterDecorator {
     // We pull out items with subFields
     const rawFields = graphqlFields(info);
 
-    const scalars = Object.keys(rawFields).filter(item => {
+    const scalars = Object.keys(rawFields).filter((item) => {
       return !item.startsWith('__');
     });
 
@@ -42,7 +42,7 @@ export function NestedFields(): ParameterDecorator {
         output.scalars.push(fieldKey);
       } else {
         const subFields = rawFields[fieldKey];
-        output[fieldKey] = Object.keys(subFields).filter(subKey => {
+        output[fieldKey] = Object.keys(subFields).filter((subKey) => {
           return Object.keys(subFields[subKey]).length === 0;
         });
       }

@@ -23,10 +23,7 @@ async function seedDatabase() {
   }
 
   for (let index = 0; index < NUM_USERS; index++) {
-    const random = new Date()
-      .getTime()
-      .toString()
-      .substring(8, 13);
+    const random = new Date().getTime().toString().substring(8, 13);
     const firstName = Faker.name.firstName();
     const lastName = Faker.name.lastName();
     const email = `${firstName
@@ -43,8 +40,8 @@ async function seedDatabase() {
             isRequired: Faker.random.arrayElement([true, false]),
             lastName,
             rating: Faker.random.number({ min: 1, max: 5 }),
-            stringEnumField: Faker.random.arrayElement(['FOO', 'BAR'])
-          }
+            stringEnumField: Faker.random.arrayElement(['FOO', 'BAR']),
+          },
         },
         `{ id email createdAt createdById }`
       );
@@ -60,11 +57,11 @@ async function seedDatabase() {
 }
 
 seedDatabase()
-  .then(result => {
+  .then((result) => {
     logger.info(result);
     return process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     logger.error(err);
     return process.exit(1);
   });

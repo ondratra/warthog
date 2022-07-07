@@ -7,6 +7,6 @@ module.exports = (toolbox: WarthogGluegunToolbox) => {
         const r = obj[b];
         return typeof r === 'string' ? r : a;
       });
-    }
+    },
   };
 };

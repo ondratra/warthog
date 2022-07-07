@@ -17,7 +17,7 @@ async function seedDatabase() {
 
   let binding: Binding;
   try {
-    binding = ((await server.getBinding()) as unknown) as Binding;
+    binding = (await server.getBinding()) as unknown as Binding;
   } catch (error) {
     Logger.error(error);
     return process.exit(1);
@@ -25,7 +25,7 @@ async function seedDatabase() {
 
   let project: Project;
   // Not doing this in try/catch because the rest of the script complains that it's being used before beind declared otherwise
-  project = ((await createProject(binding as any)) as unknown) as Project;
+  project = (await createProject(binding as any)) as unknown as Project;
 
   try {
     // Create environment
@@ -202,13 +202,13 @@ async function seedDatabase() {
     Logger.info(project);
 
     const flagsA = await binding.query.featureFlagsForUser({
-      where: { projKey: project.key, envKey: 'production', userKey: 'user-a' }
+      where: { projKey: project.key, envKey: 'production', userKey: 'user-a' },
     });
 
     Logger.info(flagsA);
 
     const flagsB = await binding.query.featureFlagsForUser({
-      where: { projKey: project.key, envKey: 'production', userKey: 'user-b' }
+      where: { projKey: project.key, envKey: 'production', userKey: 'user-b' },
     });
 
     Logger.info(flagsB);
@@ -221,11 +221,11 @@ async function seedDatabase() {
 }
 
 seedDatabase()
-  .then(result => {
+  .then((result) => {
     Logger.info(result);
     return process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     Logger.error(err);
     return process.exit(1);
   });
@@ -235,8 +235,8 @@ async function createProject(binding: Binding): Promise<Project> {
     {
       data: {
         key: `proj-${new Date().getTime()}`,
-        name: `My Project ${new Date().getTime()}`
-      }
+        name: `My Project ${new Date().getTime()}`,
+      },
     },
     `{ id key name createdAt }`
   );
@@ -252,8 +252,8 @@ async function createEnvironment(
       data: {
         key,
         name: `${key[0].toUpperCase()}${key.substring(1)}`,
-        projKey
-      }
+        projKey,
+      },
     },
     `{ id key name projKey createdAt project { id name key createdAt } }`
   );
@@ -269,8 +269,8 @@ async function createFeatureFlag(
       data: {
         key,
         name: `${key[0].toUpperCase()}${key.substring(1)}`,
-        projKey
-      }
+        projKey,
+      },
     },
     `{ id key name projKey createdAt project { id name key createdAt } }`
   );
@@ -289,8 +289,8 @@ async function createFeatureFlagUser(
         envKey,
         featureKey,
         projKey,
-        userKey
-      }
+        userKey,
+      },
     },
     `{ id projKey envKey userKey featureKey createdAt }`
   );
@@ -309,8 +309,8 @@ async function createUserSegment(
         envKey,
         projKey,
         segmentKey,
-        userKey
-      }
+        userKey,
+      },
     },
     `{ id projKey envKey userKey segmentKey createdAt }`
   );
@@ -329,8 +329,8 @@ async function createFeatureFlagSegment(
         envKey,
         featureKey,
         projKey,
-        segmentKey
-      }
+        segmentKey,
+      },
     },
     `{ id projKey envKey segmentKey featureKey createdAt }`
   );
@@ -349,8 +349,8 @@ async function createSegment(
         envKey,
         key,
         name: `${key[0].toUpperCase()}${key.substring(1)}`,
-        projKey
-      }
+        projKey,
+      },
     },
     `{
       id

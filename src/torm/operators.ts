@@ -56,19 +56,19 @@ export function addQueryBuilderWhereItem<E>(
     case 'in':
       // IN (:... is the syntax for exploding array params into (?, ?, ?) in QueryBuilder
       return qb.andWhere(`${columnWithAlias} IN (:...${parameterKey})`, {
-        [parameterKey]: value.length ? value : ['']
+        [parameterKey]: value.length ? value : [''],
       });
     case 'contains':
       return qb.andWhere(`${columnWithAlias} ILIKE :${parameterKey}`, {
-        [parameterKey]: `%${value}%`
+        [parameterKey]: `%${value}%`,
       });
     case 'startsWith':
       return qb.andWhere(`${columnWithAlias} ILIKE :${parameterKey}`, {
-        [parameterKey]: `${value}%`
+        [parameterKey]: `${value}%`,
       });
     case 'endsWith':
       return qb.andWhere(`${columnWithAlias} ILIKE :${parameterKey}`, {
-        [parameterKey]: `%${value}`
+        [parameterKey]: `%${value}`,
       });
     case 'json': {
       // It is not recommended to have snake_cased keys, but we should support them
@@ -101,7 +101,7 @@ export function addQueryBuilderWhereItem<E>(
         // TODO: add tests that:
         // go at least 3 levels deep
         // have snake_cased keys
-        const pre = nonTerminalPathParts.map(pathPart => `->'${pathPart}'`).join(''); // ->'foo'->'bar'
+        const pre = nonTerminalPathParts.map((pathPart) => `->'${pathPart}'`).join(''); // ->'foo'->'bar'
 
         // Adds: "user"."json_field"->'foo'->'bar'->>'my_baz' > 1
         addQueryBuilderWhereItem(
@@ -118,15 +118,15 @@ export function addQueryBuilderWhereItem<E>(
     // Postgres array functions: https://www.postgresql.org/docs/10/functions-array.html
     case 'containsAll':
       return qb.andWhere(`${columnWithAlias} @> :${parameterKey}`, {
-        [parameterKey]: value
+        [parameterKey]: value,
       });
     case 'containsNone':
       return qb.andWhere(`NOT (${columnWithAlias} && :${parameterKey})`, {
-        [parameterKey]: value
+        [parameterKey]: value,
       });
     case 'containsAny':
       return qb.andWhere(`${columnWithAlias} && :${parameterKey}`, {
-        [parameterKey]: value
+        [parameterKey]: value,
       });
     default:
       throw new Error(`Can't find operator ${operator}`);

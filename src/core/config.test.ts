@@ -34,7 +34,7 @@ describe('Config', () => {
       process.env = {
         NODE_ENV: 'development',
         WARTHOG_AUTO_OPEN_PLAYGROUND: 'true',
-        JEST_WORKER_ID: '12345'
+        JEST_WORKER_ID: '12345',
       };
 
       const config = new Config({ configSearchPath: __dirname });
@@ -47,7 +47,7 @@ describe('Config', () => {
     test('translates TYPEORM env vars into warthog config', async () => {
       process.env = {
         NODE_ENV: 'development',
-        TYPEORM_FOO: 'baz456'
+        TYPEORM_FOO: 'baz456',
       };
 
       const config = new Config({ configSearchPath: __dirname });

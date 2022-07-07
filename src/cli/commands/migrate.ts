@@ -8,7 +8,7 @@ export default {
   run: async (toolbox: WarthogGluegunToolbox) => {
     const {
       db,
-      print: { error }
+      print: { error },
     } = toolbox;
 
     try {
@@ -16,5 +16,5 @@ export default {
     } catch (e) {
       error(e);
     }
-  }
+  },
 };

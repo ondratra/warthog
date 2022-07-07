@@ -26,9 +26,9 @@ export class Link extends HttpLink {
 
     super({
       // TODO: cross-fetch library does not play nicely with TS
-      fetch: (fetch as any) as (input: RequestInfo, init?: RequestInit) => Promise<Response>,
+      fetch: fetch as any as (input: RequestInfo, init?: RequestInit) => Promise<Response>,
       headers,
-      uri
+      uri,
     });
   }
 }
@@ -45,7 +45,7 @@ export class RemoteBinding extends Binding {
 
     const schema = makeRemoteExecutableSchema({
       link: errorLink.concat(httpLink),
-      schema: typeDefs
+      schema: typeDefs,
     });
     logger.debug('schema', JSON.stringify(schema));
     super({ schema });
@@ -75,7 +75,7 @@ export async function generateBindingFile(inputSchemaPath: string, outputBinding
     inputSchemaPath: path.resolve(inputSchemaPath),
     isDefaultExport: false,
     outputBindingPath: path.resolve(outputBindingFile),
-    schema
+    schema,
   };
 
   const generatorInstance = new TypescriptGenerator(generatorOptions);

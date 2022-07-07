@@ -9,7 +9,7 @@ import {
   getRepository,
   Repository,
   SelectQueryBuilder,
-  WhereExpressionBuilder
+  WhereExpressionBuilder,
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
@@ -24,7 +24,7 @@ import {
   RelayFirstAfter,
   RelayLastBefore,
   RelayPageOptions,
-  RelayService
+  RelayService,
 } from './RelayService';
 import * as shortid from 'shortid';
 
@@ -164,14 +164,14 @@ export class BaseService<E extends BaseModel> {
       cursor = before;
       relayPageOptions = {
         last: limit,
-        before
+        before,
       } as RelayLastBefore;
     } else {
       limit = first || DEFAULT_LIMIT;
       cursor = after;
       relayPageOptions = {
         first: limit,
-        after
+        after,
       } as RelayFirstAfter;
     }
     const requestedFields = this.graphQLInfoService.connectionOptions(fields);
@@ -206,10 +206,10 @@ export class BaseService<E extends BaseModel> {
       edges: returnData.map((item: E) => {
         return {
           node: item,
-          cursor: this.relayService.encodeCursor(item, sorts)
+          cursor: this.relayService.encodeCursor(item, sorts),
         };
       }),
-      pageInfo: this.relayService.getPageInfo(rawData, sorts, relayPageOptions)
+      pageInfo: this.relayService.getPageInfo(rawData, sorts, relayPageOptions),
     };
   }
 
@@ -227,7 +227,7 @@ export class BaseService<E extends BaseModel> {
 
     if (!pageOptions) {
       pageOptions = {
-        limit: DEFAULT_LIMIT
+        limit: DEFAULT_LIMIT,
       };
     }
 
@@ -245,8 +245,8 @@ export class BaseService<E extends BaseModel> {
       // Querybuilder requires you to prefix all fields with the table alias.  It also requires you to
       // specify the field name using it's TypeORM attribute name, not the camel-cased DB column name
       const selection = fields
-        .filter(field => this.columnMap[field]) // This will filter out any association records that come in @Fields
-        .map(field => `${this.klass}.${field}`);
+        .filter((field) => this.columnMap[field]) // This will filter out any association records that come in @Fields
+        .map((field) => `${this.klass}.${field}`);
 
       qb = qb.select(selection);
     }
@@ -267,7 +267,7 @@ export class BaseService<E extends BaseModel> {
     }
 
     // Soft-deletes are filtered out by default, setting `deletedAt_all` is the only way to turn this off
-    const hasDeletedAts = Object.keys(where).find(key => key.indexOf('deletedAt_') === 0);
+    const hasDeletedAts = Object.keys(where).find((key) => key.indexOf('deletedAt_') === 0);
     // If no deletedAt filters specified, hide them by default
     if (!hasDeletedAts) {
       // eslint-disable-next-line @typescript-eslint/camelcase
@@ -300,10 +300,10 @@ export class BaseService<E extends BaseModel> {
           qb,
           attr,
           operator,
-          whereParameter: (where[key] as any) as Record<string, string | number>,
+          whereParameter: where[key] as any as Record<string, string | number>,
           relations: this.repository.metadata.relations,
           baseService: this,
-          paramKeyCounter
+          paramKeyCounter,
         });
         if (isRelation) {
           return qb;
@@ -340,59 +340,50 @@ export class BaseService<E extends BaseModel> {
       const handleConditions = (
         qb: SelectQueryBuilder<E>,
         rawFilters: WhereExpression[] | undefined,
-        conditionFactory: (qb: WhereExpressionBuilder, whereInputProcessor: (qb: WhereExpressionBuilder) => WhereExpressionBuilder) => void,
+        conditionFactory: (
+          qb: WhereExpressionBuilder,
+          whereInputProcessor: (qb: WhereExpressionBuilder) => WhereExpressionBuilder
+        ) => void
       ) => {
         if (!rawFilters || !rawFilters.length) {
           return;
         }
 
-        const filters = rawFilters.filter(value => JSON.stringify(value) !== '{}');
+        const filters = rawFilters.filter((value) => JSON.stringify(value) !== '{}');
         if (!filters.length) {
           return;
         }
 
-        const conditionedQbBrackets = new Brackets(qb2 => {
+        const conditionedQbBrackets = new Brackets((qb2) => {
           filters
-            .filter(value => Object.keys(value).length) // disregard empty where objects
+            .filter((value) => Object.keys(value).length) // disregard empty where objects
             .forEach((filterWhere: WhereExpression) => {
-              conditionFactory(qb2, qb3 => {
+              conditionFactory(qb2, (qb3) => {
                 processWhereInput(topLevelQb, qb3 as SelectQueryBuilder<any>, filterWhere);
                 return qb3;
-              })
-            })
+              });
+            });
         });
 
-        qb.andWhere(conditionedQbBrackets)
-      }
+        qb.andWhere(conditionedQbBrackets);
+      };
 
       const { AND, OR, NOT, ...rest } = where;
 
       // AND conditions
-      handleConditions(
-        qb,
-        AND,
-        (qb2, whereInputProcessor) => qb2.andWhere(
-          new Brackets(whereInputProcessor)
-        )
-      )
+      handleConditions(qb, AND, (qb2, whereInputProcessor) =>
+        qb2.andWhere(new Brackets(whereInputProcessor))
+      );
 
       // OR conditions
-      handleConditions(
-        qb,
-        OR,
-        (qb2, whereInputProcessor) => qb2.orWhere(
-          new Brackets(whereInputProcessor)
-        )
-      )
+      handleConditions(qb, OR, (qb2, whereInputProcessor) =>
+        qb2.orWhere(new Brackets(whereInputProcessor))
+      );
 
       // NOT conditions
-      handleConditions(
-        qb,
-        NOT,
-        (qb2, whereInputProcessor) => qb2.andWhere(
-          new NotBrackets(whereInputProcessor)
-        )
-      )
+      handleConditions(qb, NOT, (qb2, whereInputProcessor) =>
+        qb2.andWhere(new NotBrackets(whereInputProcessor))
+      );
 
       if (rest) {
         processWheres(topLevelQb, qb, rest);
@@ -443,7 +434,7 @@ export class BaseService<E extends BaseModel> {
   async createMany(data: DeepPartial<E>[], userId: string, options?: BaseOptions): Promise<E[]> {
     const manager = options?.manager ?? this.manager;
 
-    data = data.map(item => {
+    data = data.map((item) => {
       return { ...item, createdById: userId };
     });
 
@@ -477,7 +468,7 @@ export class BaseService<E extends BaseModel> {
   ): Promise<E> {
     const manager = options?.manager ?? this.manager;
     const found = await this.findOne(where as Partial<E>);
-    const mergeData = ({ id: found.id, updatedById: userId } as any) as DeepPartial<E>;
+    const mergeData = { id: found.id, updatedById: userId } as any as DeepPartial<E>;
     const entity = manager.merge<E>(this.entityClass, new this.entityClass(), data, mergeData);
 
     // skipMissingProperties -> partial validation of only supplied props
@@ -499,16 +490,16 @@ export class BaseService<E extends BaseModel> {
 
     const data = {
       deletedAt: new Date().toISOString(),
-      deletedById: userId
+      deletedById: userId,
     };
 
     const whereNotDeleted = {
       ...where,
-      deletedAt: null
+      deletedAt: null,
     };
 
     const found = await manager.findOneByOrFail<E>(this.entityClass, whereNotDeleted as any);
-    const idData = ({ id: found.id } as any) as DeepPartial<E>;
+    const idData = { id: found.id } as any as DeepPartial<E>;
     const entity = manager.merge<E>(this.entityClass, new this.entityClass(), data as any, idData);
 
     await manager.save(entity as any);
@@ -546,7 +537,7 @@ namespace RelationsManager {
     parameters: WhereRelationParameters<E>
   ): boolean {
     // try to find property among relations
-    const relation = parameters.relations.find(item => item.propertyName == parameters.attr);
+    const relation = parameters.relations.find((item) => item.propertyName == parameters.attr);
     if (!relation) {
       return false;
     }
@@ -625,7 +616,7 @@ namespace RelationsManager {
       const tmpQb = parameters.qb.createQueryBuilder();
       const tmpParameters = {
         ...parameters,
-        qb: tmpQb
+        qb: tmpQb,
       };
       // setup SQL join and where conditions
       common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName);
@@ -645,10 +636,16 @@ namespace RelationsManager {
       const tmpQb = parameters.qb.createQueryBuilder();
       const tmpParameters = {
         ...parameters,
-        qb: tmpQb
+        qb: tmpQb,
       };
       // setup SQL join and where conditions
-      const foreignTableAlias = common(tmpParameters, localIdColumn, foreignTableName, foreignColumnMap, foreignColumnName);
+      const foreignTableAlias = common(
+        tmpParameters,
+        localIdColumn,
+        foreignTableName,
+        foreignColumnMap,
+        foreignColumnName
+      );
 
       // convert where clause created for temporary query builder into "every" form
       const foreingIdColumn = `"${foreignTableAlias}"."${foreignColumnMap[foreignColumnName]}"`;
@@ -735,7 +732,7 @@ namespace RelationsManager {
       const tmpQb = parameters.qb.createQueryBuilder();
       const tmpParameters = {
         ...parameters,
-        qb: tmpQb
+        qb: tmpQb,
       };
 
       // setup where conditions
@@ -756,7 +753,7 @@ namespace RelationsManager {
       const tmpQb = parameters.qb.createQueryBuilder();
       const tmpParameters = {
         ...parameters,
-        qb: tmpQb
+        qb: tmpQb,
       };
 
       // setup where conditions
@@ -808,7 +805,7 @@ namespace RelationsManager {
     foreignColumnMap: StringMap
   ) {
     // add where condition for each conditioned property
-    Object.keys(parameters.whereParameter).forEach(item => {
+    Object.keys(parameters.whereParameter).forEach((item) => {
       const [foreignAttr, operator] = parseWhereKey(item);
       const whereColumn = `"${foreignTableName}"."${foreignColumnMap[foreignAttr]}"`;
       const paramKey = `param${parameters.paramKeyCounter.counter++}`;

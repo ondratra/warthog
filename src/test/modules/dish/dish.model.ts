@@ -14,16 +14,12 @@ export class Dish extends BaseModel {
   @EnumField('StringEnum', StringEnum, { nullable: true })
   stringEnumField?: StringEnum;
 
-  @ManyToOne(
-    () => KitchenSink,
-    (kitchenSink: KitchenSink) => kitchenSink.dishes,
-    {
-      nullable: false,
-      skipGraphQLField: true,
-      modelName: 'Dish',
-      relModelName: 'KitchenSink',
-      propertyName: 'kitchenSink'
-    }
-  )
+  @ManyToOne(() => KitchenSink, (kitchenSink: KitchenSink) => kitchenSink.dishes, {
+    nullable: false,
+    skipGraphQLField: true,
+    modelName: 'Dish',
+    relModelName: 'KitchenSink',
+    propertyName: 'kitchenSink',
+  })
   kitchenSink?: KitchenSink;
 }

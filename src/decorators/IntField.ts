@@ -22,7 +22,7 @@ export function IntField(options: IntFieldOptions = {}): any {
     warthogColumnMeta: options,
     gqlFieldType: Int,
     dbType: options.dataType ?? 'int',
-    dbColumnOptions: { ...nullableOption, ...defaultOption }
+    dbColumnOptions: { ...nullableOption, ...defaultOption },
   });
 
   return composeMethodDecorators(...factories);

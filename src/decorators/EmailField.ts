@@ -16,7 +16,7 @@ export function EmailField(options: EmailFieldOptions = {}): any {
 
   const factories = getCombinedDecorator({
     fieldType: 'email',
-    warthogColumnMeta: optionsWithDefaults
+    warthogColumnMeta: optionsWithDefaults,
   });
 
   // Adds email validation

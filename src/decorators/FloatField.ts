@@ -21,7 +21,7 @@ export function FloatField(options: FloatFieldOptions = {}): any {
     warthogColumnMeta: options,
     gqlFieldType: Float,
     dbType: options.dataType ?? 'float8',
-    dbColumnOptions: { ...nullableOption, ...defaultOption }
+    dbColumnOptions: { ...nullableOption, ...defaultOption },
   });
 
   return composeMethodDecorators(...factories);

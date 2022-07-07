@@ -8,7 +8,7 @@ import {
   PostUpdateArgs,
   PostWhereArgs,
   PostWhereInput,
-  PostWhereUniqueInput
+  PostWhereUniqueInput,
 } from '../generated';
 
 import { Post } from './post.model';

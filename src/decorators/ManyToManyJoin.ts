@@ -11,7 +11,7 @@ export function ManyToManyJoin(parentType: any, joinFunc: any, options: any = {}
   const factories = [
     JoinTable() as MethodDecoratorFactory,
     Field(() => [parentType()], { ...options }) as MethodDecoratorFactory,
-    TypeORMManyToMany(parentType, joinFunc, options) as MethodDecoratorFactory
+    TypeORMManyToMany(parentType, joinFunc, options) as MethodDecoratorFactory,
   ];
 
   getMetadataStorage().addModelRelation({ ...options, isList: true });

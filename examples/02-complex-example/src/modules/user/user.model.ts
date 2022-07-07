@@ -22,7 +22,7 @@ import {
   NumericField,
   ObjectType,
   OneToMany,
-  StringField
+  StringField,
 } from '../../../../../src';
 import { Post } from '../post/post.model';
 
@@ -30,7 +30,7 @@ import { Post } from '../post/post.model';
 // Also - must use string enums
 export enum StringEnum {
   FOO = 'FOO',
-  BAR = 'BAR'
+  BAR = 'BAR',
 }
 
 @InputType('EventParamInput')
@@ -114,7 +114,7 @@ export class User extends BaseModel {
     maxLength: 50,
     minLength: 2,
     nullable: true,
-    description: 'This is a string field'
+    description: 'This is a string field',
   })
   stringField: string;
 
@@ -165,7 +165,7 @@ export class User extends BaseModel {
   // https://github.com/typeorm/typeorm/blob/master/test/functional/spatial/postgres/entity/Post.ts
   @CustomField({
     api: { type: 'json', nullable: true },
-    db: { type: 'geometry', spatialFeatureType: 'Point', nullable: false }
+    db: { type: 'geometry', spatialFeatureType: 'Point', nullable: false },
   })
   geometryField?: object;
 
@@ -229,10 +229,7 @@ export class User extends BaseModel {
   @IntField({ array: true, nullable: true })
   arrayOfInts!: number[];
 
-  @OneToMany(
-    () => Post,
-    (post: Post) => post.user
-  )
+  @OneToMany(() => Post, (post: Post) => post.user)
   posts?: Post[];
 
   // TODO: ForeignKeyField

@@ -53,8 +53,8 @@ export async function callAPIError<E>(promise: Promise<E>): Promise<APIError> {
     return {
       message: response.message,
       extensions: {
-        code: 'GRAPHQL_ERROR'
-      }
+        code: 'GRAPHQL_ERROR',
+      },
     };
   }
 

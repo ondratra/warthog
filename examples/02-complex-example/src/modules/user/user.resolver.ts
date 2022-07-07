@@ -7,7 +7,7 @@ import {
   UserUpdateArgs,
   UserWhereArgs,
   UserWhereInput,
-  UserWhereUniqueInput
+  UserWhereUniqueInput,
 } from '../../../generated';
 import { User } from './user.model';
 

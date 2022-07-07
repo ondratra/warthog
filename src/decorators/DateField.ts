@@ -22,7 +22,7 @@ export function DateField(options: DateFieldOptions = {}): any {
     warthogColumnMeta: options,
     gqlFieldType: GraphQLISODateTime,
     dbType: options.dataType || 'timestamp',
-    dbColumnOptions: { ...nullableOption, ...defaultOption }
+    dbColumnOptions: { ...nullableOption, ...defaultOption },
   });
 
   return composeMethodDecorators(...factories);

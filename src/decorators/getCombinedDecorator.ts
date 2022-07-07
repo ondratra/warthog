@@ -21,7 +21,7 @@ export function getCombinedDecorator<T extends Partial<ColumnMetadata>>({
   warthogColumnMeta,
   gqlFieldType = String,
   dbType = 'varchar',
-  dbColumnOptions: columnOptions = {}
+  dbColumnOptions: columnOptions = {},
 }: WarthogCombinedDecoratorOptions<T>) {
   const nullableOption = warthogColumnMeta.nullable === true ? { nullable: true } : {};
   const defaultOption =
@@ -62,7 +62,7 @@ export function getCombinedDecorator<T extends Partial<ColumnMetadata>>({
       TypeGraphQLField(getGraphqlField, {
         ...nullableOption,
         ...defaultOption,
-        ...tgqlDescriptionOption
+        ...tgqlDescriptionOption,
       })
     );
   }
@@ -76,7 +76,7 @@ export function getCombinedDecorator<T extends Partial<ColumnMetadata>>({
         ...defaultOption,
         ...columnOptions,
         ...uniqueOption,
-        ...arrayOption
+        ...arrayOption,
         // ...typeOrmColumnOption: // TODO: Enable this when TypeORM is fixed: https://github.com/typeorm/typeorm/issues/5906
       }) as MethodDecoratorFactory
     );

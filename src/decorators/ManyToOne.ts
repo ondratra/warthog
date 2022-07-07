@@ -38,7 +38,7 @@ export function ManyToOne(parentType: any, joinFunc: any, options: any = {}): an
     ...graphQLdecorator,
     TypeORMManyToOne(parentType, joinFunc, options) as MethodDecoratorFactory,
     JoinColumn() as MethodDecoratorFactory,
-    createForeignKeyField
+    createForeignKeyField,
   ];
   getMetadataStorage().addModelRelation({ ...options, isList: false });
 

@@ -23,5 +23,5 @@ export const GraphQLBytes = new GraphQLScalarType({
 
   serialize(value: Buffer) {
     return value ? `0x` + value.toString('hex') : value; // value sent to the client
-  }
+  },
 });

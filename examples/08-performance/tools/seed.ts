@@ -20,7 +20,7 @@ async function seedDatabase() {
 
   let binding: Binding;
   try {
-    binding = ((await server.getBinding()) as unknown) as Binding;
+    binding = (await server.getBinding()) as unknown as Binding;
   } catch (error) {
     Logger.error(error);
 
@@ -31,8 +31,8 @@ async function seedDatabase() {
     const user: User = await binding.mutation.createUser(
       {
         data: {
-          firstName: 'Test User'
-        }
+          firstName: 'Test User',
+        },
       },
       `{ id firstName }`
     );
@@ -46,14 +46,14 @@ async function seedDatabase() {
     for (let i = 0; i < 30_000; i++) {
       postBuffer.push({
         title: Faker.lorem.sentence(5),
-        userId: user.id
+        userId: user.id,
       });
 
       if (postBuffer.length >= BATCH_SIZE) {
         Logger.info(`Writing posts batch ${batchNumber++}`);
         await binding.mutation.createManyPosts(
           {
-            data: postBuffer
+            data: postBuffer,
           },
           `{ id title }`
         );
@@ -68,11 +68,11 @@ async function seedDatabase() {
 }
 
 seedDatabase()
-  .then(result => {
+  .then((result) => {
     Logger.info(result);
     return process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     Logger.error(err);
     return process.exit(1);
   });

@@ -7,9 +7,6 @@ export class Post extends BaseModel {
   @StringField()
   name?: string;
 
-  @OneToMany(
-    () => Author,
-    (author: Author) => author.posts
-  )
+  @OneToMany(() => Author, (author: Author) => author.posts)
   authors?: Author[];
 }

@@ -16,7 +16,7 @@ describe('Enums', () => {
 
     enum StringEnum {
       Foo = 'FOO',
-      Bar = 'BAR'
+      Bar = 'BAR',
     }
 
     @ObjectType()
@@ -34,7 +34,7 @@ describe('Enums', () => {
     }
 
     const schemaInfo = await getSchemaInfo({
-      resolvers: [SampleResolver]
+      resolvers: [SampleResolver],
     });
     schemaIntrospection = schemaInfo.schemaIntrospection;
   });

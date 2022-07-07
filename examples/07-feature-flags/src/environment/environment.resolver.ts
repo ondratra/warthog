@@ -7,7 +7,7 @@ import {
   EnvironmentUpdateArgs,
   EnvironmentWhereArgs,
   EnvironmentWhereInput,
-  EnvironmentWhereUniqueInput
+  EnvironmentWhereUniqueInput,
 } from '../../generated';
 
 // import { FeatureFlagSegment, FeatureFlagUser, Project, Segment, UserSegment } from '../models';

@@ -19,11 +19,11 @@ export function getServer(AppOptions: ServerOptions<Context> = {}, dbOptions = {
           user: {
             email: 'admin@test.com',
             id: 'abc12345',
-            permissions: ['user:read', 'user:update', 'user:create', 'user:delete', 'photo:delete']
-          }
+            permissions: ['user:read', 'user:update', 'user:create', 'user:delete', 'photo:delete'],
+          },
         };
       },
-      ...AppOptions
+      ...AppOptions,
     },
     dbOptions
   );

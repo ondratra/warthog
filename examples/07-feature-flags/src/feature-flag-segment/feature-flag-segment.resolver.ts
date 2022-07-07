@@ -7,7 +7,7 @@ import {
   FeatureFlagSegmentUpdateArgs,
   FeatureFlagSegmentWhereArgs,
   FeatureFlagSegmentWhereInput,
-  FeatureFlagSegmentWhereUniqueInput
+  FeatureFlagSegmentWhereUniqueInput,
 } from '../../generated';
 
 import { FeatureFlagSegment } from './feature-flag-segment.model';

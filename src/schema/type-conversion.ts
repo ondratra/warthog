@@ -5,7 +5,7 @@ import {
   GraphQLID,
   GraphQLInt,
   GraphQLScalarType,
-  GraphQLString
+  GraphQLString,
 } from 'graphql';
 import { GraphQLISODateTime } from 'type-graphql';
 import { GraphQLBigNumber } from '../tgql/GraphQLBigNumber';
@@ -102,7 +102,7 @@ export function columnToTypeScriptType(column: ColumnMetadata): string {
       GraphQLJSONObject: 'JsonObject',
       ID: 'string', // TODO: should this be ID_TYPE?
       Int: 'number',
-      String: 'string'
+      String: 'string',
     };
 
     return typeMap[graphqlType] || 'string';

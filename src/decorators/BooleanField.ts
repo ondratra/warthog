@@ -16,7 +16,7 @@ export function BooleanField(options: BooleanFieldOptions = {}): any {
     fieldType: 'boolean',
     warthogColumnMeta: options,
     gqlFieldType: GraphQLBoolean,
-    dbType: 'boolean'
+    dbType: 'boolean',
   });
 
   return composeMethodDecorators(...factories);

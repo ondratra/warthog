@@ -15,13 +15,13 @@ export function getTestServer(options: ServerOptions<any> = {}) {
             'kitchenSink:delete',
             'dish:create',
             'dish:read',
-            'dish:update'
-          ]
-        }
+            'dish:update',
+          ],
+        },
       };
     },
     introspection: true,
     openPlayground: false,
-    ...options
+    ...options,
   });
 }

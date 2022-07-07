@@ -82,11 +82,11 @@ export class CodeGenerator {
         scalarsMap: [
           {
             type: 'ID' as any,
-            scalar: GraphQLID
-          }
+            scalar: GraphQLID,
+          },
         ],
         resolvers: this.options.resolversPath,
-        validate: this.options.validateResolvers
+        validate: this.options.validateResolvers,
       });
       debug('code-generator:buildGraphQLSchema:end');
     }
@@ -153,7 +153,7 @@ export const AppDataSource = new DataSource({
     debug('writeToGeneratedFolder:' + filename + ':start');
     const x = await writeFilePromise(path.join(this.generatedFolder, filename), contents, {
       encoding: 'utf8',
-      flag: 'w'
+      flag: 'w',
     });
     debug('writeToGeneratedFolder:' + filename + ':end');
     return x;

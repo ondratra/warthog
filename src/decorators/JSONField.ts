@@ -17,7 +17,7 @@ export function JSONField(options: JSONFieldOptions = {}): any {
     fieldType: 'json',
     warthogColumnMeta: options,
     gqlFieldType: options.gqlFieldType ?? GraphQLJSONObject,
-    dbType: 'jsonb'
+    dbType: 'jsonb',
   });
 
   return composeMethodDecorators(...factories);

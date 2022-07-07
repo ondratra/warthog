@@ -7,7 +7,7 @@ import {
   Mutation,
   Query,
   Resolver,
-  Root
+  Root,
 } from 'type-graphql';
 import { Inject } from 'typedi';
 import { BaseContext, Fields, StandardDeleteResponse, UserId } from '../../../';
@@ -17,7 +17,7 @@ import {
   KitchenSinkUpdateArgs,
   KitchenSinkWhereArgs,
   KitchenSinkWhereInput,
-  KitchenSinkWhereUniqueInput
+  KitchenSinkWhereUniqueInput,
 } from '../../generated';
 import { Dish } from '../dish/dish.model';
 import { KitchenSink } from './kitchen-sink.model';

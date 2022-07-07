@@ -91,7 +91,7 @@ export class RelayService {
         hasNextPage: false,
         hasPreviousPage: false,
         startCursor: '',
-        endCursor: ''
+        endCursor: '',
       };
     }
     let limit;
@@ -114,7 +114,7 @@ export class RelayService {
       // typically a client will not specify a cursor on the first page and would otherwise
       hasPreviousPage: !!cursor,
       startCursor: this.encodeCursor(firstItem, sort),
-      endCursor: this.encodeCursor(lastItem, sort)
+      endCursor: this.encodeCursor(lastItem, sort),
     };
   }
 
@@ -138,7 +138,7 @@ export class RelayService {
     assert(record.getValue, `Record must be a BaseModel: ${JSON.stringify(record, null, 2)}`);
 
     const sortArray = this.normalizeSort(sortable);
-    const payload: SortAndValueArray = sortArray.map(sort => record.getValue(sort.column));
+    const payload: SortAndValueArray = sortArray.map((sort) => record.getValue(sort.column));
 
     return this.encoding.encode(payload);
   }
@@ -174,7 +174,7 @@ export class RelayService {
       return [{ column: 'id', direction: 'ASC' }];
     }
 
-    const hasIdSort = sort.find(item => item.column === 'id');
+    const hasIdSort = sort.find((item) => item.column === 'id');
 
     // If we're not already sorting by ID, add this to sort to make cursor work
     // When the user-specified sort isn't unique
@@ -235,7 +235,7 @@ export class RelayService {
           ]
         } 
      */
-    return ({
+    return {
       OR: sorts.map(({ column, direction }, i) => {
         const allOthersEqual = sorts
           .slice(0, i)
@@ -243,11 +243,11 @@ export class RelayService {
 
         return Object.assign(
           {
-            [`${column}_${comparisonOperator(direction)}`]: decodedCursor[i]
+            [`${column}_${comparisonOperator(direction)}`]: decodedCursor[i],
           },
           ...allOthersEqual
         );
-      })
-    } as unknown) as WhereInput;
+      }),
+    } as unknown as WhereInput;
   }
 }

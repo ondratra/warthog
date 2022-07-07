@@ -28,7 +28,7 @@ let kitchenSink: KitchenSink;
 
 describe('server', () => {
   // Make sure to clean up server
-  beforeAll(async done => {
+  beforeAll(async (done) => {
     // setTestServerEnvironmentVariables();
 
     runKey = String(new Date().getTime()); // used to ensure test runs create unique data
@@ -49,12 +49,12 @@ describe('server', () => {
         onAfterGraphQLMiddleware: (app: express.Application) => {
           app;
           onAfterCalled = true;
-        }
+        },
       });
 
       await server.start();
 
-      binding = ((await server.getBinding()) as unknown) as Binding;
+      binding = (await server.getBinding()) as unknown as Binding;
     } catch (error) {
       logger.error(error);
       throw new Error(error);
@@ -72,7 +72,7 @@ describe('server', () => {
   });
 
   // Make sure to clean up server
-  afterAll(async done => {
+  afterAll(async (done) => {
     await server.stop();
     done();
   });
@@ -117,7 +117,7 @@ describe('server', () => {
     );
 
     expect(results).toMatchSnapshot();
-    const firstResult = (results[0] as unknown) as KitchenSink;
+    const firstResult = results[0] as unknown as KitchenSink;
 
     expect(firstResult.dishes.length).toEqual(20);
   });
@@ -163,16 +163,16 @@ describe('server', () => {
     //
   });
 
-  test('throws errors when given bad input on a single create', async done => {
+  test('throws errors when given bad input on a single create', async (done) => {
     expect.assertions(1);
 
-    createKitchenSink(binding, '').catch(error => {
+    createKitchenSink(binding, '').catch((error) => {
       expect(error).toHaveProperty('message', 'Argument Validation Error\n');
       done();
     });
   });
 
-  test('throws errors when given bad input on a many create', async done => {
+  test('throws errors when given bad input on a many create', async (done) => {
     expect.assertions(1);
     const sink = {
       dateField: '2000-03-26T19:39:08.597Z',
@@ -181,7 +181,7 @@ describe('server', () => {
       integerField: 41,
       booleanField: false,
       floatField: -1.3885,
-      stringEnumField: StringEnum.BAR
+      stringEnumField: StringEnum.BAR,
     };
 
     createManyKitchenSinks(binding, [sink]).catch((error: Error) => {
@@ -190,7 +190,7 @@ describe('server', () => {
     });
   });
 
-  test('getBindingError pulls correct info from binding error', async done => {
+  test('getBindingError pulls correct info from binding error', async (done) => {
     expect.assertions(4);
 
     let originalError;
@@ -486,7 +486,7 @@ describe('server', () => {
     try {
       const where: KitchenSinkWhereInput = {
         stringField_endsWith: 'w',
-        stringField_contains: 'a'
+        stringField_contains: 'a',
       };
       result = await binding.query.kitchenSinks({ limit: 100, where }, '{ stringField }');
     } catch (error) {
@@ -520,10 +520,10 @@ describe('server', () => {
         {
           stringField: 'Updated via Email Field!',
           integerField: 9876,
-          booleanField: false
+          booleanField: false,
         },
         {
-          emailField: email
+          emailField: email,
         }
       );
     } catch (error) {
@@ -536,7 +536,7 @@ describe('server', () => {
       stringField: 'Updated via Email Field!',
       integerField: 9876,
       booleanField: false,
-      floatField: 123.456
+      floatField: 123.456,
     });
 
     // Update via ID
@@ -546,10 +546,10 @@ describe('server', () => {
         {
           stringField: 'Updated via ID!',
           integerField: 9876,
-          booleanField: false
+          booleanField: false,
         },
         {
-          emailField: email
+          emailField: email,
         }
       );
     } catch (error) {
@@ -559,13 +559,13 @@ describe('server', () => {
     const { id: _, booleanField, floatField, integerField, ...expected2 } = result;
     expect(expected2).toEqual({
       emailField: 'update@warthog.com',
-      stringField: 'Updated via ID!'
+      stringField: 'Updated via ID!',
     });
 
     // Delete
     try {
       result = await binding.mutation.deleteKitchenSink({
-        where: { emailField: email }
+        where: { emailField: email },
       });
     } catch (error) {
       throw new Error(error);
@@ -621,9 +621,7 @@ describe('server', () => {
 
   test('Send request to /foo via passed in custom express app', async () => {
     expect.assertions(5);
-    const response: request.Response = await request(customExpressApp)
-      .get('/foo')
-      .send();
+    const response: request.Response = await request(customExpressApp).get('/foo').send();
 
     expect(response.status).toEqual(200);
     expect(response.body).toEqual({ bar: 'baz' });
@@ -632,9 +630,7 @@ describe('server', () => {
 
   test("Send request to /foo via server's exposed express app", async () => {
     expect.assertions(5);
-    const response: request.Response = await request(server.expressApp)
-      .get('/foo')
-      .send();
+    const response: request.Response = await request(server.expressApp).get('/foo').send();
 
     expect(response.status).toEqual(200);
     expect(response.body).toEqual({ bar: 'baz' });
@@ -646,33 +642,33 @@ describe('server', () => {
     let stringFieldColumn: ColumnMetadata;
     beforeEach(() => {
       const kitchenSinkTableMeta = server.connection.entityMetadatas.find(
-        entity => entity.name === 'KitchenSink'
+        (entity) => entity.name === 'KitchenSink'
       ) as EntityMetadata;
 
       if (!kitchenSinkTableMeta) {
         throw new Error('Expected to find the KitchenSink TypeORM metadata');
       }
 
-      kitchenSinkDBColumns = kitchenSinkTableMeta.columns.map(column => column.propertyName);
+      kitchenSinkDBColumns = kitchenSinkTableMeta.columns.map((column) => column.propertyName);
 
       stringFieldColumn = kitchenSinkTableMeta.columns.find(
-        column => column.propertyName === 'stringField'
+        (column) => column.propertyName === 'stringField'
       ) as ColumnMetadata;
     });
 
-    test('apiOnly column does not exist in the DB', async done => {
+    test('apiOnly column does not exist in the DB', async (done) => {
       expect(kitchenSinkDBColumns).not.toContain('apiOnlyField');
       done();
     });
 
-    test('dbOnly column does exist in the DB', async done => {
+    test('dbOnly column does exist in the DB', async (done) => {
       expect(kitchenSinkDBColumns).toContain('dbOnlyField');
       done();
     });
 
     // TypeORM comment support is currently broken
     // See: https://github.com/typeorm/typeorm/issues/5906
-    test.skip('description maps to comment DB metadata', async done => {
+    test.skip('description maps to comment DB metadata', async (done) => {
       expect(stringFieldColumn.comment).toEqual('This is a string field');
       done();
     });
@@ -682,11 +678,11 @@ describe('server', () => {
     let apiOnlyEntityMeta: EntityMetadata;
     beforeEach(() => {
       apiOnlyEntityMeta = server.connection.entityMetadatas.find(
-        entity => entity.name === 'ApiOnly'
+        (entity) => entity.name === 'ApiOnly'
       ) as EntityMetadata;
     });
 
-    test('Does not exist in the DB', async done => {
+    test('Does not exist in the DB', async (done) => {
       expect(apiOnlyEntityMeta).toBeFalsy();
       done();
     });
@@ -704,18 +700,18 @@ describe('server', () => {
     let kitchenSinkDBColumns: string[];
     beforeEach(() => {
       const kitchenSinkTableMeta = server.connection.entityMetadatas.find(
-        entity => entity.name === 'KitchenSink'
+        (entity) => entity.name === 'KitchenSink'
       ) as EntityMetadata;
 
       if (!kitchenSinkTableMeta) {
         throw new Error('Expected to find the KitchenSink TypeORM metadata');
       }
 
-      kitchenSinkDBColumns = kitchenSinkTableMeta.columns.map(column => column.propertyName);
+      kitchenSinkDBColumns = kitchenSinkTableMeta.columns.map((column) => column.propertyName);
     });
 
     describe('readonly flag', () => {
-      test('readonly column does exist in the DB', async done => {
+      test('readonly column does exist in the DB', async (done) => {
         expect(kitchenSinkDBColumns).toContain('customTextFieldReadOnly');
         done();
       });
@@ -749,8 +745,8 @@ async function createKitchenSink(
         // TODO: for some reason this is getting added as NULL
         jsonField: { hello: 'world' },
         stringField: 'My String',
-        customTextFieldNoSortOrFilter: 'text field text field text field'
-      }
+        customTextFieldNoSortOrFilter: 'text field text field text field',
+      },
     },
     returnFields
   );
@@ -765,7 +761,7 @@ async function updateKitchenSink(
   return binding.mutation.updateKitchenSink(
     {
       data,
-      where
+      where,
     },
     returnFields
   );
@@ -776,10 +772,10 @@ async function createManyKitchenSinks(binding: any, data = KITCHEN_SINKS): Promi
 }
 
 async function createManyDishes(binding: any, kitchenSinkId: string): Promise<KitchenSink> {
-  const data = Array.from({ length: 20 }, (v, i) => i).map(item => {
+  const data = Array.from({ length: 20 }, (v, i) => i).map((item) => {
     return {
       name: `Dish ${item}`,
-      kitchenSink: kitchenSinkId
+      kitchenSink: kitchenSinkId,
     };
   });
   let dishes;

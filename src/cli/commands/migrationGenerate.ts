@@ -9,7 +9,7 @@ export default {
     const {
       db,
       parameters: { options },
-      print: { error }
+      print: { error },
     } = toolbox;
 
     if (!options.name) {
@@ -21,5 +21,5 @@ export default {
     } catch (e) {
       error(e);
     }
-  }
+  },
 };

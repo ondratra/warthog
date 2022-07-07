@@ -9,10 +9,10 @@ export function getServer(appOptions = {}, dbOptions = {}) {
       context: () => {
         return {
           user: {
-            id: 'abc123'
-          }
+            id: 'abc123',
+          },
         };
-      }
+      },
     },
     dbOptions
   );

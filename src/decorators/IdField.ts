@@ -16,7 +16,7 @@ export function IdField(options: IdFieldOptions = {}): any {
   const factories = getCombinedDecorator({
     fieldType: 'id',
     warthogColumnMeta: options,
-    dbColumnOptions: { ...nullableOption, ...uniqueOption }
+    dbColumnOptions: { ...nullableOption, ...uniqueOption },
   });
 
   return composeMethodDecorators(...factories);
